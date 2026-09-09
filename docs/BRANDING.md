@@ -13,3 +13,7 @@ Alpha-qualified pixels were sampled from a 200px downsample of each source, grou
 `src/app/branding.css` applies those sampled colors through the shared semantic variables. Near-black `#061522` is an intentional supporting shade; secondary steel remains `#BAC9D2 / #7E929F / #354C5D`. Metallic treatment uses solid readable text over a gold surface gradient. The earlier provisional branding notes in `ELEVATION.md` are superseded by this implementation.
 
 Recovery Room bookings remain pending approval of its real services, durations and providers. Artwork integration does not invent business offerings or change the shared scheduler.
+
+## Validation
+
+The merged branding/network application passes lint, production build (including TypeScript), all 12 unit tests, and all 12 browser tests. Browser coverage includes asset loading and app icons, desktop/mobile overflow and Axe checks, client and staff booking persistence, and the existing network journeys. Desktop collective and mobile Recovery Room screenshots were visually inspected. Source originals remain unchanged; large originals are archived assets and are not referenced by the interface.
