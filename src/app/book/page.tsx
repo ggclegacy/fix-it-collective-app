@@ -1,3 +1,6 @@
+import { rules, settings, canManage } from "@/lib/booking-rules";
+import { services } from "@/lib/catalog";
+import { appointmentsFor } from "@/lib/scheduling";
 import Link from "next/link";
 import { BookingFlow } from "@/components/booking-flow";
 import { currentUser, demoEnabled } from "@/lib/auth";
@@ -17,6 +20,28 @@ export default async function Book({
     experience?: string;
   }>;
 }) {
+  if (process.env.VERCEL) {
+    return (
+      <main id="main" className="booking-page section">
+        <p className="eyebrow">YOUR NEXT VISIT</p>
+        <h1>
+          A little time for <em>you.</em>
+        </h1>
+        <p className="notice">
+          Online booking is not open yet. Explore Katie’s Studio and Kamilla’s
+          Recovery Room while we prepare your booking experience.
+        </p>
+        <div className="provider-entry-links">
+          <Link className="button navy" href="/grooming">
+            Explore Katie’s Studio
+          </Link>
+          <Link className="button outline" href="/recovery">
+            Explore Kamilla’s Recovery Room
+          </Link>
+        </div>
+      </main>
+    );
+  }
   const q = await searchParams;
   const user = await currentUser();
   let appointment: Appointment | undefined;
@@ -27,7 +52,9 @@ export default async function Book({
     if (
       !appointment ||
       !user ||
-      (user.role === "client" && appointment.client_id !== user.id)
+      (user.role === "client"
+        ? appointment.client_id !== user.id
+        : !canManage(user, appointment.professional_id))
     )
       notFound();
   }
@@ -50,8 +77,44 @@ export default async function Book({
         key={appointment?.id ?? "new"}
         user={user}
         demo={demoEnabled()}
+        business={settings()}
+        serviceRules={Object.fromEntries(
+          services.map((s) => [s.id, rules(s.id)]),
+        )}
+        catalog={services.map((s) => {
+          const r = rules(s.id);
+          return {
+            ...s,
+            duration: r.duration,
+            buffer: r.buffer,
+            price:
+              r.price ?? (demoEnabled() && s.id !== "massage" ? s.price : -1),
+          };
+        })}
+        usual={
+          user
+            ? appointmentsFor(user)
+                .filter(
+                  (a) =>
+                    a.client_id === (client?.id ?? user.id) &&
+                    a.status === "completed" &&
+                    (!q.experience ||
+                      a.professional_id ===
+                        (q.experience === "katie" ? "pro-a" : "pro-b")),
+                )
+                .at(-1)
+            : undefined
+        }
         initialService={appointment?.service_id ?? q.service}
-        initialProfessional={appointment?.professional_id ?? q.professional}
+        initialProfessional={
+          appointment?.professional_id ??
+          q.professional ??
+          (q.experience === "katie"
+            ? "pro-a"
+            : q.experience === "camilla" || q.experience === "kamilla"
+              ? "pro-b"
+              : undefined)
+        }
         appointment={appointment ? { ...appointment } : undefined}
         client={client ? { ...client } : undefined}
       />

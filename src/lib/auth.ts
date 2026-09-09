@@ -38,6 +38,7 @@ export async function session(userId: string) {
   });
 }
 export async function currentUser(): Promise<User | null> {
+  if (process.env.VERCEL) return null;
   const token = (await cookies()).get("fic_session")?.value;
   if (!token) return null;
   const user =

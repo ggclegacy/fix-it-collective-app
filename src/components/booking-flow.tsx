@@ -7,12 +7,19 @@ import {
   consultationSummary,
   type ProviderProfile,
 } from "@/lib/provider-profiles";
-import { services, professionals, policy, studio } from "@/lib/catalog";
+import {
+  services,
+  professionals,
+  policy,
+  studio,
+  type Service,
+} from "@/lib/catalog";
 import type { Appointment, Slot, User } from "@/lib/types";
 import { api, message } from "@/lib/client";
 import { BookingSummary } from "./booking-summary";
 import { BookingConfirmation } from "./booking-confirmation";
 import { BookingSelection } from "./booking-selection";
+import { ReferencePhotos } from "./reference-photos";
 import { SigninForm } from "./signin-form";
 export function BookingFlow({
   user,
@@ -21,7 +28,25 @@ export function BookingFlow({
   initialProfessional,
   appointment,
   client,
+  catalog = services,
+  business = {},
+  usual,
+  serviceRules = {},
 }: {
+  serviceRules?: Record<
+    string,
+    {
+      cancellation_hours: number;
+      deposit: number;
+      card_required: number;
+      horizon_days: number;
+      lead_minutes: number;
+      enabled: number;
+    }
+  >;
+  catalog?: Service[];
+  business?: Record<string, string>;
+  usual?: Appointment;
   user: User | null;
   demo: boolean;
   initialService?: string;
@@ -30,7 +55,7 @@ export function BookingFlow({
   client?: Pick<User, "id" | "name">;
 }) {
   const [serviceId, setService] = useState(
-    services.some((s) => s.id === initialService) ? initialService! : "",
+    catalog.some((s) => s.id === initialService) ? initialService! : "",
   );
   const [professionalId, setProfessional] = useState(
     professionals.some((p) => p.id === initialProfessional)
@@ -52,7 +77,21 @@ export function BookingFlow({
   const [confirmed, setConfirmed] = useState("");
   const [ack, setAck] = useState(false);
   const [intake, setIntake] = useState("");
-  const service = services.find((s) => s.id === serviceId);
+  const [requestKey] = useState(() => crypto.randomUUID());
+  const [hasIntake, setHasIntake] = useState(false),
+    [healthUnchanged, setHealthUnchanged] = useState(false),
+    [waitlisted, setWaitlisted] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    fetch(
+      `/api/intake${client ? `?client=${encodeURIComponent(client.id)}` : ""}`,
+    )
+      .then((r) => r.json())
+      .then((d) => setHasIntake(Boolean(d.hasIntake)))
+      .catch(() => {});
+  }, [user, client]);
+  const service = catalog.find((s) => s.id === serviceId);
+  const currentRules = serviceRules[serviceId];
   const professional = professionals.find(
     (p) => p.id === (slot?.professionalId ?? professionalId),
   );
@@ -96,13 +135,16 @@ export function BookingFlow({
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/provider-profile?provider=katie", {
-        cache: "no-store",
-      });
+      const r = await fetch(
+        `/api/provider-profile?provider=${professionalId === "pro-b" ? "camilla" : "katie"}`,
+        {
+          cache: "no-store",
+        },
+      );
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
       if (!data.saved)
-        throw new Error("Save your Grooming DNA in Katie’s Studio first.");
+        throw new Error("Save your preferences in your provider’s room first.");
       setIntake(
         consultationSummary(data.saved.profile as ProviderProfile).slice(
           0,
@@ -116,7 +158,7 @@ export function BookingFlow({
     }
   }
   async function confirm() {
-    if (!slot) return;
+    if (!slot || busy) return;
     setBusy(true);
     setError("");
     try {
@@ -127,6 +169,8 @@ export function BookingFlow({
         addonIds,
         acknowledged: ack,
         intake,
+        requestKey,
+        healthUnchanged,
       };
       const result = await api<{ id: string }>(
         appointment
@@ -151,6 +195,7 @@ export function BookingFlow({
   if (confirmed && slot)
     return (
       <BookingConfirmation
+        business={business}
         service={service}
         professional={professional}
         slot={slot}
@@ -162,7 +207,9 @@ export function BookingFlow({
     );
   return (
     <>
-      <div className="booking-heading">
+      <div
+        className={`booking-heading ${professionalId === "pro-b" ? "massage-booking" : "grooming-booking"}`}
+      >
         <p className="eyebrow">
           {appointment
             ? "A CHANGE OF PLANS"
@@ -173,27 +220,49 @@ export function BookingFlow({
         <h1>{appointment ? "Find a new time." : "Your next good day."}</h1>
         <p>A few simple choices. A visit that feels like you.</p>
       </div>
+      {usual && !appointment && (
+        <button
+          className="button outline"
+          onClick={() => {
+            setProfessional(usual.professional_id);
+            setService(usual.service_id);
+            setStep(2);
+          }}
+        >
+          Book my usual · same as last visit
+        </button>
+      )}
+      {professionalId === "pro-b" && (
+        <div className="notice">
+          {business.therapist_license
+            ? `${business.therapist_name} · Louisiana license ${business.therapist_license} · ${business.establishment_name} ${business.establishment_license}`
+            : "Massage appointments await approved services, availability and license information."}
+        </div>
+      )}
       <ol className="steps">
-        {["Your service", "Your professional", "Your time", "The details"].map(
-          (s, i) => (
-            <li
-              key={s}
-              className={step === i ? "active" : step > i ? "done" : ""}
+        {[
+          "Your professional",
+          "Your goal & service",
+          "Your time",
+          "The details",
+        ].map((s, i) => (
+          <li
+            key={s}
+            className={step === i ? "active" : step > i ? "done" : ""}
+          >
+            <button
+              disabled={i > step || busy}
+              onClick={() => {
+                setStep(i);
+                setError("");
+              }}
+              aria-current={step === i ? "step" : undefined}
             >
-              <button
-                disabled={i > step || busy}
-                onClick={() => {
-                  setStep(i);
-                  setError("");
-                }}
-                aria-current={step === i ? "step" : undefined}
-              >
-                <span>{step > i ? <Check size={14} /> : i + 1}</span>
-                {s}
-              </button>
-            </li>
-          ),
-        )}
+              <span>{step > i ? <Check size={14} /> : i + 1}</span>
+              {s}
+            </button>
+          </li>
+        ))}
       </ol>
       <div className="booking-layout">
         <section className="booking-main">
@@ -201,8 +270,8 @@ export function BookingFlow({
             <h2>
               {
                 [
-                  "What brings you in?",
                   "Find your person.",
+                  "What brings you in?",
                   "Make it your time.",
                   "Make it yours.",
                 ][step]
@@ -212,6 +281,7 @@ export function BookingFlow({
           </div>
           {step < 2 && (
             <BookingSelection
+              catalog={catalog}
               step={step}
               service={service}
               serviceId={serviceId}
@@ -234,10 +304,13 @@ export function BookingFlow({
                   min={DateTime.now().setZone(studio.timezone).toISODate()!}
                   max={DateTime.now()
                     .setZone(studio.timezone)
-                    .plus({ days: policy.horizonDays })
+                    .plus({
+                      days: currentRules?.horizon_days ?? policy.horizonDays,
+                    })
                     .toISODate()!}
                   onChange={(e) => {
                     setDate(e.target.value);
+                    setWaitlisted(false);
                     setSlot(null);
                     setSlots([]);
                   }}
@@ -279,6 +352,31 @@ export function BookingFlow({
                     No openings on this date. Try another day or choose best
                     available.
                   </p>
+                  {user && professionalId !== "any" && (
+                    <button
+                      className="button outline"
+                      disabled={busy || waitlisted}
+                      onClick={async () => {
+                        setBusy(true);
+                        try {
+                          await api("/api/waitlist", {
+                            professionalId,
+                            serviceId,
+                            date,
+                          });
+                          setWaitlisted(true);
+                        } catch (e) {
+                          setError(message(e));
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
+                    >
+                      {waitlisted
+                        ? "Added to waitlist · messaging connection pending"
+                        : "Join the waitlist for this day"}
+                    </button>
+                  )}
                   <button
                     className="button outline"
                     onClick={() => {
@@ -318,36 +416,101 @@ export function BookingFlow({
                   </div>
                   {!client && <Link href="/account/profile">Edit profile</Link>}
                 </div>
-                <label>
-                  Anything you’d like us to know?{" "}
-                  <span className="muted">(optional)</span>
-                  <textarea
-                    value={intake}
-                    onChange={(e) => setIntake(e.target.value)}
-                    maxLength={2000}
-                    placeholder="Your style goals, preferences, or questions."
-                    rows={4}
-                  />
-                </label>
-                {!client && (
-                  <div className="notice">
+                {professionalId === "pro-b" ? (
+                  <div className="policy-card">
+                    <h3>Prepare your session</h3>
+                    <p>
+                      {hasIntake
+                        ? "Your signed intake is saved. Confirm it is still current, or update only what has changed."
+                        : "Complete your confidential intake once. Your body map, preferences and health information stay together in Recovery Room."}
+                    </p>
+                    <Link
+                      className="button outline"
+                      href="/recovery/prepare"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {hasIntake
+                        ? "Review / update intake"
+                        : "Prepare Your Session"}{" "}
+                      ↗
+                    </Link>
+                    <p>
+                      After saving your intake, return here to keep your
+                      selected time.
+                    </p>
                     <button
-                      type="button"
                       className="text-link"
                       disabled={busy}
-                      onClick={useStyleBrief}
+                      onClick={async () => {
+                        setBusy(true);
+                        try {
+                          const response = await fetch(
+                            `/api/intake${client ? `?client=${encodeURIComponent(client.id)}` : ""}`,
+                          );
+                          const data = await response.json();
+                          if (!response.ok) throw new Error(data.error);
+                          setHasIntake(data.hasIntake);
+                          if (!data.hasIntake)
+                            setError(
+                              "Finish and sign your intake, then check again.",
+                            );
+                          else setError("");
+                        } catch (e) {
+                          setError(message(e));
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
                     >
-                      Use my saved grooming brief
+                      Check saved intake
                     </button>
-                    <p>
-                      This replaces the notes above. Review before confirming:
-                      booking shares these notes with studio staff.
-                    </p>
+                    {hasIntake && (
+                      <label className="check-row">
+                        <input
+                          type="checkbox"
+                          checked={healthUnchanged}
+                          onChange={(e) => setHealthUnchanged(e.target.checked)}
+                        />
+                        My health information is current and unchanged since my
+                        last saved intake.
+                      </label>
+                    )}
                   </div>
+                ) : (
+                  <>
+                    <label>
+                      Anything you’d like us to know?{" "}
+                      <span className="muted">(optional)</span>
+                      <textarea
+                        value={intake}
+                        onChange={(e) => setIntake(e.target.value)}
+                        maxLength={2000}
+                        placeholder="Your style goals, preferences, or questions."
+                        rows={4}
+                      />
+                    </label>
+                    {!client && (
+                      <button
+                        className="text-link"
+                        disabled={busy}
+                        onClick={useStyleBrief}
+                      >
+                        Use my saved grooming brief
+                      </button>
+                    )}
+                    {user.role === "client" && !client && (
+                      <ReferencePhotos editable />
+                    )}
+                  </>
                 )}
                 <div className="policy-card">
                   <h3>A note before you book</h3>
-                  <p>{policy.text}</p>
+                  <p>
+                    {currentRules
+                      ? `Online changes close ${currentRules.cancellation_hours} hours before your visit. Minimum notice: ${currentRules.lead_minutes} minutes. Deposit: $${(currentRules.deposit / 100).toFixed(2)}. ${currentRules.card_required ? "A card is required." : ""}`
+                      : policy.text}
+                  </p>
                   <Link href="/policies" className="text-link">
                     Read visit policies ↗
                   </Link>
@@ -359,13 +522,14 @@ export function BookingFlow({
                     onChange={(e) => setAck(e.target.checked)}
                   />
                   <span>
-                    I acknowledge the preview booking policy and understand this
-                    is a sample appointment.
+                    I acknowledge the service’s booking and cancellation policy.
                   </span>
                 </label>
                 <div className="notice">
-                  No payment is due. Card details are never requested in this
-                  preview.
+                  {currentRules &&
+                  (currentRules.deposit > 0 || currentRules.card_required)
+                    ? "Online payments are not connected. Contact the studio to arrange this visit; no charge has been made."
+                    : "Pay at your visit. No online charge will be made."}
                 </div>
               </div>
             ))}
@@ -392,7 +556,11 @@ export function BookingFlow({
             {step < 3 ? (
               <button
                 className="button navy"
-                disabled={!serviceId || (step === 2 && (!slot || loading))}
+                disabled={
+                  (step === 0 && professionalId === "any") ||
+                  (step === 1 && !serviceId) ||
+                  (step === 2 && (!slot || loading))
+                }
                 onClick={() => {
                   setStep(step + 1);
                   setError("");
@@ -404,14 +572,26 @@ export function BookingFlow({
               user && (
                 <button
                   className="button navy"
-                  disabled={busy || !ack || !slot}
+                  disabled={
+                    busy ||
+                    !ack ||
+                    !slot ||
+                    (professionalId === "pro-b" &&
+                      !appointment &&
+                      (!hasIntake || !healthUnchanged)) ||
+                    Boolean(
+                      currentRules &&
+                      !appointment &&
+                      (currentRules.deposit > 0 || currentRules.card_required),
+                    )
+                  }
                   onClick={() => void confirm()}
                 >
                   {busy
                     ? "Saving your visit…"
                     : appointment
                       ? "Confirm new time"
-                      : "Confirm preview visit"}{" "}
+                      : "Confirm visit"}{" "}
                   <ArrowRight size={18} />
                 </button>
               )

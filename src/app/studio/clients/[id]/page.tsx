@@ -1,4 +1,8 @@
+import { Client360 } from "@/components/business/client-360";
+import { ReferencePhotos } from "@/components/reference-photos";
+import { canManage } from "@/lib/booking-rules";
 import Link from "next/link";
+import { RecoveryBrief } from "@/components/recovery-brief";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -13,9 +17,9 @@ export default async function ClientPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser(true);
+  const staff = await requireUser(true);
   const { id } = await params;
-  const c = clients().find((c) => c.id === id);
+  const c = clients(staff).find((c) => c.id === id);
   if (!c) notFound();
   const user = db()
     .prepare(
@@ -24,9 +28,9 @@ export default async function ClientPage({
     .get(id) as User;
   const notes = db()
     .prepare(
-      "SELECT id,body,visibility,created_at FROM notes WHERE client_id=? ORDER BY created_at DESC",
+      "SELECT id,body,visibility,created_at FROM notes WHERE client_id=? AND author_id=? ORDER BY created_at DESC",
     )
-    .all(id) as {
+    .all(id, staff.id) as {
     id: string;
     body: string;
     visibility: string;
@@ -34,9 +38,9 @@ export default async function ClientPage({
   }[];
   const forms = db()
     .prepare(
-      "SELECT id,form_key,version,answers,created_at FROM form_responses WHERE client_id=? ORDER BY created_at DESC",
+      "SELECT f.id,f.form_key,f.version,f.answers,f.created_at FROM form_responses f JOIN appointments a ON a.id=f.appointment_id WHERE f.client_id=? AND (?='owner' OR a.professional_id IN (SELECT professional_id FROM staff_assignments WHERE user_id=?)) ORDER BY f.created_at DESC",
     )
-    .all(id) as {
+    .all(id, staff.role, staff.id) as {
     id: string;
     form_key: string;
     version: string;
@@ -78,12 +82,16 @@ export default async function ClientPage({
           <strong>{c.no_shows}</strong>
         </div>
       </div>
+      <Client360 user={staff} id={id} />
+      {canManage(staff, "pro-a") && <ReferencePhotos clientId={id} />}
+      <RecoveryBrief viewer={staff} clientId={id} />
       <div className="account-grid">
         <section>
           <div className="list-heading">
             <h2>Visit timeline</h2>
           </div>
-          {appointmentsFor(user)
+          {appointmentsFor(staff)
+            .filter((a) => a.client_id === user.id)
             .reverse()
             .map((a) => (
               <AppointmentCard key={a.id} appointment={a} staff />

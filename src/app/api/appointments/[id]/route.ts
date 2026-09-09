@@ -15,7 +15,20 @@ export async function PATCH(
     if (raw.action === "reschedule")
       return { id: book(user, bookingSchema.parse(raw), id) };
     const input = z
-      .object({ status: z.enum(["cancelled", "completed", "no_show"]) })
+      .object({
+        status: z.enum([
+          "requested",
+          "checked_out",
+          "late_cancel",
+          "booked",
+          "confirmed",
+          "checked_in",
+          "in_service",
+          "cancelled",
+          "completed",
+          "no_show",
+        ]),
+      })
       .parse(raw);
     changeStatus(user, id, input.status);
     return { ok: true };

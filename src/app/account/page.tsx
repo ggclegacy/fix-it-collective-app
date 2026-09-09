@@ -30,6 +30,16 @@ export default async function Account() {
           Book a visit <ArrowUpRight size={18} />
         </Link>
       </div>
+      <section className="rr-entry">
+        <div>
+          <p className="eyebrow">RECOVERY ROOM · WITH KAMILLA</p>
+          <h2>Your care starts here.</h2>
+          <p>Prepare your first session or update what’s changed.</p>
+        </div>
+        <Link className="rr-primary" href="/recovery/prepare">
+          Prepare your session <ArrowUpRight size={16} />
+        </Link>
+      </section>
       <div className="account-grid">
         <section>
           <div className="list-heading">

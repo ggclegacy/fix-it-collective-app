@@ -8,3 +8,11 @@ playwright-report/
 test-results/
 .DS_Store
 .vercel/
+
+.next-booking/
+
+# Isolated Business OS verification output
+.next-business-os/
+.next-business-build/
+
+artifacts/

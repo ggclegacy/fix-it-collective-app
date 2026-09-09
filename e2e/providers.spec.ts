@@ -134,7 +134,7 @@ test("saved profiles are private, survive reload, can enter booking and can be d
     .click();
   await expect(page).toHaveURL(/service=signature-cut/);
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page.getByRole("button", { name: "Best available" }).click();
+
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await expect(page.locator(".slots button").first()).toBeVisible();
   await page.locator(".slots button").first().click();

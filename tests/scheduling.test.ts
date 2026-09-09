@@ -37,7 +37,7 @@ after(() => {
   rmSync(dir, { recursive: true, force: true });
 });
 test("professional pricing and add-on duration come from the catalog", () => {
-  assert.equal(quote("signature-cut", "pro-b").price, 7000);
+  assert.throws(() => quote("signature-cut", "pro-b"));
   assert.equal(quote("signature-cut", "pro-a", ["scalp"]).duration, 60);
   assert.throws(() => quote("color", "pro-a"));
   assert.throws(() => quote("signature-cut", "pro-a", ["scalp", "scalp"]));

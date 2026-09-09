@@ -1,3 +1,4 @@
+import { assertManage } from "@/lib/booking-rules";
 import { z } from "zod";
 import { DateTime } from "luxon";
 import { randomUUID } from "node:crypto";
@@ -47,7 +48,26 @@ export async function POST(request: Request) {
       !professionals.some((p) => p.id === input.professionalId)
     )
       throw new Error("Invalid professional.");
+    if ("professionalId" in input) assertManage(user, input.professionalId);
+    if (input.action === "unblock") {
+      const b = db()
+        .prepare("SELECT professional_id FROM blocks WHERE id=?")
+        .get(input.id) as { professional_id: string } | undefined;
+      if (!b) throw new Error("Block not found.");
+      assertManage(user, b.professional_id);
+    }
+    if (
+      input.action === "note" &&
+      user.role !== "owner" &&
+      !db()
+        .prepare(
+          "SELECT 1 FROM appointments a JOIN staff_assignments s ON s.professional_id=a.professional_id WHERE a.client_id=? AND s.user_id=?",
+        )
+        .get(input.clientId, user.id)
+    )
+      throw new Error("Client access denied.");
     if (input.action === "book") {
+      assertManage(user, input.booking.professionalId);
       const client = db()
         .prepare(
           "SELECT id,name,email,phone,role,marketing,preferred_professional FROM users WHERE id=? AND role='client'",

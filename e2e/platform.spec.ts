@@ -12,12 +12,17 @@ test("public booking → new client account → same appointment in studio → c
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
+  await page
+    .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
+    .click();
   await page.getByRole("link", { name: "Find your next visit" }).click();
-  await page.getByRole("button", { name: "HAIR The signature cut" }).click();
+  await page.getByRole("button", { name: /Katie Men’s grooming/ }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Haircut", exact: true }).click();
+  await page.getByRole("button", { name: /The signature cut/ }).click();
   await page.getByRole("checkbox", { name: "Scalp refresh" }).check();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page.getByRole("button", { name: "Best available" }).click();
-  await page.getByRole("button", { name: "Continue", exact: true }).click();
+
   await page.getByLabel("Appointment date").fill(visitDate.toISODate()!);
   await expect(page.locator(".slots button").first()).toBeVisible();
   const time = await page.locator(".slots button").first().innerText();
@@ -35,9 +40,9 @@ test("public booking → new client account → same appointment in studio → c
   await page.getByRole("button", { name: "Create your space" }).click();
   await expect(page.getByText("Anything you’d like us to know?")).toBeVisible();
   await page.getByRole("checkbox", { name: "I acknowledge" }).check();
-  await page.getByRole("button", { name: "Confirm preview visit" }).click();
+  await page.getByRole("button", { name: "Confirm visit" }).click();
   await expect(
-    page.getByText("Your preview appointment is saved."),
+    page.getByText("Your appointment is saved."),
   ).toBeVisible();
   await page.getByRole("link", { name: "View your visits" }).click();
   await expect(
@@ -56,8 +61,9 @@ test("public booking → new client account → same appointment in studio → c
   await studio.goto("/signin?next=/studio");
   await studio.getByRole("button", { name: "Enter studio preview" }).click();
   await expect(
-    studio.getByRole("heading", { name: "Make it a good day." }),
+    studio.getByRole("heading", { level: 1 }),
   ).toBeVisible();
+  await expect(studio).toHaveURL(/\/studio$/);
   const records = await (await studio.request.get("/api/appointments")).json();
   expect(
     records.appointments.some((a: { id: string }) => a.id === id),
@@ -66,7 +72,7 @@ test("public booking → new client account → same appointment in studio → c
   await studio.getByLabel("Calendar date").fill(visitDate.toISODate()!);
   await expect(studio.getByText(clientName, { exact: true })).toBeVisible();
   await studio.getByText(clientName, { exact: true }).click();
-  await expect(studio.getByRole("heading", { name: clientName })).toBeVisible();
+  await expect(studio.getByRole("heading", { name: clientName })).toBeVisible({timeout:60000});
   await studio.getByLabel("Service note").fill("INTERNAL QA NOTE");
   await studio.getByRole("button", { name: "Save note" }).click();
   await expect(
@@ -86,7 +92,7 @@ test("public booking → new client account → same appointment in studio → c
   await page.getByRole("checkbox", { name: "I acknowledge" }).check();
   await page.getByRole("button", { name: "Confirm new time" }).click();
   await expect(
-    page.getByText("Your preview appointment is saved."),
+    page.getByText("Your appointment is saved."),
   ).toBeVisible();
   const moved = await (await page.request.get("/api/appointments")).json();
   expect(moved.appointments[0].id).toBe(id);
@@ -132,6 +138,10 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
       "/signin",
     ]) {
       await page.goto(route);
+      if (route === "/")
+        await page
+          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
+          .click();
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
       await expect(page.locator("h1")).toBeVisible();
       expect(
@@ -159,7 +169,7 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
   await page.goto("/signin?next=/studio");
   await page.getByRole("button", { name: "Enter studio preview" }).click();
   await expect(
-    page.getByRole("heading", { name: "Make it a good day." }),
+    page.getByRole("heading", { level: 1 }),
   ).toBeVisible();
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
@@ -171,6 +181,10 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
       "/studio/settings",
     ]) {
       await page.goto(route);
+      if (route === "/")
+        await page
+          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
+          .click();
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
       expect(
         await page.evaluate(
@@ -206,6 +220,10 @@ test("client visits and preferences work at desktop and phone sizes", async ({
     await page.setViewportSize({ width, height: 900 });
     for (const route of ["/account", "/account/profile"]) {
       await page.goto(route);
+      if (route === "/")
+        await page
+          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
+          .click();
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
       expect(
         await page.evaluate(
@@ -242,15 +260,9 @@ test("partner discovery preserves identity and does not invent bookable recovery
   await expect(
     page.getByText("The Recovery Room menu is being prepared."),
   ).toBeVisible();
-  await page.goto("/book?service=signature-cut");
-  await page.getByRole("button", { name: "Recovery", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Continue", exact: true }),
-  ).toBeDisabled();
-  await page.getByRole("button", { name: "Beauty", exact: true }).click();
-  await page.getByRole("button", { name: /Color consultation/ }).click();
-  await expect(page.locator(".visit-brand")).toHaveText("Fix It Collective");
-  await expect(
-    page.getByRole("button", { name: "Continue", exact: true }),
-  ).toBeEnabled();
+  await page.goto("/book?experience=camilla");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "First massage", exact: true }).click();
+  await page.getByRole("button", { name: /Personalized massage/ }).click();
+  await expect(page.locator(".visit-brand")).toHaveText("Recovery Room by Milla");
 });

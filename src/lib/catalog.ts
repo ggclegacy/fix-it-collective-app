@@ -14,7 +14,19 @@ export const policy = {
   slotInterval: 15,
   text: "Preview policy: please reschedule or cancel at least 24 hours before your visit. No deposits or cancellation charges are collected in this preview.",
 };
-export const services = [
+export type Service = {
+  id: string;
+  name: string;
+  brand: "collective" | "recovery";
+  category: string;
+  description: string;
+  duration: number;
+  buffer: number;
+  price: number;
+  intervalWeeks: number;
+  number: string;
+};
+export const services: Service[] = [
   {
     id: "signature-cut",
     name: "The signature cut",
@@ -67,22 +79,35 @@ export const services = [
     intervalWeeks: 8,
     number: "04",
   },
-] as const;
+  {
+    id: "massage",
+    name: "Personalized massage",
+    brand: "recovery",
+    category: "Massage",
+    description:
+      "A session shaped around your objective. Duration and pricing require Kamilla’s approval.",
+    duration: 60,
+    buffer: 15,
+    price: -1,
+    intervalWeeks: 4,
+    number: "05",
+  },
+];
 export const professionals = [
   {
     id: "pro-a",
-    name: "Professional A",
-    initials: "A",
-    description: "Preview professional · hair & grooming",
+    name: "Katie",
+    initials: "K",
+    description: "Men’s grooming concierge",
     services: ["signature-cut", "cut-beard", "beard"],
     priceOverrides: {} as Record<string, number>,
   },
   {
     id: "pro-b",
-    name: "Professional B",
-    initials: "B",
-    description: "Preview professional · hair & color",
-    services: ["signature-cut", "beard", "color"],
+    name: "Kamilla",
+    initials: "M",
+    description: "Massage & recovery",
+    services: ["massage"],
     priceOverrides: { "signature-cut": 7000 } as Record<string, number>,
   },
 ];
@@ -96,10 +121,12 @@ export const addons = [
   },
 ];
 export function money(cents: number) {
+  if(cents<0)return "Awaiting approval";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(cents / 100);
 }
 export function serviceById(id: string) {

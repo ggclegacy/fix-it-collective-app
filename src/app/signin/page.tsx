@@ -27,7 +27,14 @@ export default async function Signin({
           <br />A little less life admin.
         </p>
       </div>
-      <SigninForm next={next} demo={demoEnabled()} />
+      {process.env.VERCEL ? (
+        <div className="notice" role="status">
+          Accounts and online booking are not open yet. Your personal space will
+          be available when booking opens.
+        </div>
+      ) : (
+        <SigninForm next={next} demo={demoEnabled()} />
+      )}
     </main>
   );
 }

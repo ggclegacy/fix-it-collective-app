@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { randomUUID, scryptSync } from "node:crypto";
 import { DateTime } from "luxon";
 import { studio } from "./catalog";
+import { migrateBusiness } from "./business/schema";
 let database: DatabaseSync | undefined;
 export function db() {
   if (database) return database;
@@ -39,12 +40,32 @@ export function db() {
  CREATE TRIGGER IF NOT EXISTS prevent_block_overlap BEFORE INSERT ON blocks BEGIN
  SELECT RAISE(ABORT,'Move or cancel appointments before blocking this time.') WHERE EXISTS(SELECT 1 FROM appointments WHERE professional_id=NEW.professional_id AND status='confirmed' AND start_at<NEW.end_at AND busy_until>NEW.start_at); END;
  `);
+  database.exec(`
+ CREATE TRIGGER IF NOT EXISTS prevent_block_overlap_update BEFORE UPDATE ON blocks BEGIN SELECT RAISE(ABORT,'Move or cancel appointments before blocking this time.') WHERE EXISTS(SELECT 1 FROM appointments WHERE professional_id=NEW.professional_id AND status='confirmed' AND start_at<NEW.end_at AND busy_until>NEW.start_at); END;
+ CREATE TABLE IF NOT EXISTS service_rules (service_id TEXT PRIMARY KEY, duration INTEGER NOT NULL, buffer INTEGER NOT NULL, price INTEGER, deposit INTEGER NOT NULL DEFAULT 0, card_required INTEGER NOT NULL DEFAULT 0, lead_minutes INTEGER NOT NULL DEFAULT 120, horizon_days INTEGER NOT NULL DEFAULT 45, cancellation_hours INTEGER NOT NULL DEFAULT 24, enabled INTEGER NOT NULL DEFAULT 0);
+ CREATE TABLE IF NOT EXISTS staff_assignments (user_id TEXT PRIMARY KEY REFERENCES users(id), professional_id TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS booking_details (appointment_id TEXT PRIMARY KEY REFERENCES appointments(id), stage TEXT NOT NULL DEFAULT 'confirmed' CHECK(stage IN ('booked','confirmed','checked_in','in_service','completed','cancelled','no_show')), deposit INTEGER NOT NULL DEFAULT 0, paid INTEGER NOT NULL DEFAULT 0, payment_status TEXT NOT NULL DEFAULT 'not_required', cancellation_hours INTEGER NOT NULL, intake_id TEXT, request_key TEXT UNIQUE, policy_snapshot TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS waitlist (id TEXT PRIMARY KEY,client_id TEXT NOT NULL REFERENCES users(id),professional_id TEXT NOT NULL,service_id TEXT NOT NULL,date TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'waiting' CHECK(status IN ('waiting','offered','booked','removed')),created_at TEXT NOT NULL,UNIQUE(client_id,professional_id,service_id,date));
+ CREATE TABLE IF NOT EXISTS business_settings (id TEXT PRIMARY KEY,value TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS entitlements (id TEXT PRIMARY KEY,client_id TEXT NOT NULL REFERENCES users(id),kind TEXT NOT NULL CHECK(kind IN ('package','membership')),service_id TEXT NOT NULL,remaining INTEGER NOT NULL CHECK(remaining>=0),expires_at TEXT);
+ CREATE TABLE IF NOT EXISTS recurring_plans (id TEXT PRIMARY KEY,client_id TEXT NOT NULL REFERENCES users(id),professional_id TEXT NOT NULL,service_id TEXT NOT NULL,interval_weeks INTEGER NOT NULL CHECK(interval_weeks>0),status TEXT NOT NULL DEFAULT 'draft');
+ CREATE TABLE IF NOT EXISTS payment_events (provider_event_id TEXT PRIMARY KEY,appointment_id TEXT NOT NULL REFERENCES appointments(id),amount INTEGER NOT NULL,created_at TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS notification_jobs (id TEXT PRIMARY KEY,appointment_id TEXT REFERENCES appointments(id),waitlist_id TEXT REFERENCES waitlist(id),event TEXT NOT NULL,due_at TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending',attempts INTEGER NOT NULL DEFAULT 0,provider_id TEXT);
+ `);
+  migrateBusiness(database);
   // Demo data is opt-in outside the development server. No public staff bypass in production.
   if (
     process.env.NODE_ENV === "development" ||
     process.env.SEED_DEMO === "true"
   )
     seed(database);
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.SEED_DEMO === "true"
+  )
+    database
+      .prepare("INSERT OR IGNORE INTO staff_assignments VALUES(?,?)")
+      .run("demo-staff", "pro-a");
   return database;
 }
 function seed(d: DatabaseSync) {

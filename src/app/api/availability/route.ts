@@ -1,3 +1,4 @@
+import { canManage } from "@/lib/booking-rules";
 import { z } from "zod";
 import { availableSlots } from "@/lib/scheduling";
 import { endpoint } from "@/lib/http";
@@ -18,9 +19,18 @@ export async function GET(request: Request) {
     if (q.exclude) {
       const user = await currentUser();
       const a = db()
-        .prepare("SELECT client_id FROM appointments WHERE id=?")
-        .get(q.exclude) as { client_id: string } | undefined;
-      if (!user || !a || (user.role === "client" && a.client_id !== user.id))
+        .prepare(
+          "SELECT client_id,professional_id FROM appointments WHERE id=?",
+        )
+        .get(q.exclude) as
+        { client_id: string; professional_id: string } | undefined;
+      if (
+        !user ||
+        !a ||
+        (user.role === "client"
+          ? a.client_id !== user.id
+          : !canManage(user, a.professional_id))
+      )
         throw new Error("Appointment not found.");
     }
     return {

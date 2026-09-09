@@ -13,6 +13,7 @@ export function BookingConfirmation({
   appointment,
   client,
   user,
+  business = {},
 }: {
   service: (typeof services)[number] | undefined;
   professional: (typeof professionals)[number] | undefined;
@@ -21,6 +22,7 @@ export function BookingConfirmation({
   appointment?: Appointment;
   client?: Pick<User, "id" | "name">;
   user: User | null;
+  business?: Record<string, string>;
 }) {
   return (
     <section className="confirmation">
@@ -35,11 +37,11 @@ export function BookingConfirmation({
         <br />
         <em>Just for you.</em>
       </h1>
-      <p>Your preview appointment is saved. No charge has been made.</p>
+      <p>Your appointment is saved. No charge has been made.</p>
       <div className="confirmation-summary">
         <BrandEmblem brand={service?.brand} size={96} />
         <p className="brand-label">{brandForService(service).name}</p>
-        <h3>{service?.name}</h3>
+        <h2>{service?.name}</h2>
         <p>
           {DateTime.fromISO(slot.start)
             .setZone(studio.timezone)
@@ -52,11 +54,34 @@ export function BookingConfirmation({
           America/Chicago · Reference {confirmed.slice(0, 8).toUpperCase()}
         </small>
       </div>
+      {professional?.id === "pro-b" && user?.role === "client" && (
+        <Link className="rr-primary" href="/recovery/prepare">
+          Prepare your session <ArrowRight size={18} />
+        </Link>
+      )}
       <p className="muted">
         Confirmation messages are not connected yet.
         <br />
         Your appointment is available in your account.
       </p>
+      <div className="appointment-actions">
+        <Link href={`/book?reschedule=${confirmed}`}>Reschedule</Link>
+        <Link href="/account">Cancel / manage visit</Link>
+        {business.address ? (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`}
+          >
+            Directions
+          </a>
+        ) : (
+          <span>
+            Directions will appear once the studio address is confirmed.
+          </span>
+        )}
+        {professional?.id === "pro-b" && (
+          <Link href="/recovery/prepare">Review intake</Link>
+        )}
+      </div>
       <Link
         className="button navy"
         href={client || user?.role !== "client" ? "/studio" : "/account"}

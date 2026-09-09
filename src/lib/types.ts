@@ -22,6 +22,11 @@ export type Appointment = {
   status: AppointmentStatus;
   addons: string;
   client_name: string;
+  stage?: string;
+  deposit?: number;
+  paid?: number;
+  payment_status?: string;
+  intake_id?: string;
   created_at: string;
 };
 export type Slot = {

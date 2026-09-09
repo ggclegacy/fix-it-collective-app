@@ -4064,3 +4064,12 @@ input[type="checkbox"] {
   gap: 16px;
   margin: 24px 0 40px;
 }
+
+/* Booking extends the existing blue, gold and cream controls. */
+.grooming-booking, .massage-booking { border-radius: 22px; padding: clamp(22px,4vw,48px); background: linear-gradient(110deg,rgba(8,24,42,.94),rgba(8,24,42,.5)),url('/providers/katie-studio.webp') center/cover; color: #fff4da; }
+.massage-booking { background-image: linear-gradient(110deg,rgba(8,24,42,.92),rgba(8,24,42,.35)),url('/providers/camilla-room.webp'); }
+.grooming-booking h1,.massage-booking h1,.grooming-booking p,.massage-booking p {color:inherit}
+.details-form details label {display:grid;gap:8px;margin:12px 0}
+.details-form details input {max-width:100%;min-height:44px}
+.details-form summary {cursor:pointer;padding:12px 0;font-weight:600}
+@media(max-width:640px){.steps{overflow-x:auto}.steps button{min-width:90px}.booking-main{min-width:0}.experience-tabs{flex-wrap:wrap}.booking-controls button{min-height:44px}.selection p{overflow-wrap:anywhere}}

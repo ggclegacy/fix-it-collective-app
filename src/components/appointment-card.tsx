@@ -19,6 +19,7 @@ export function AppointmentCard({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [intake, setIntake] = useState("");
   const [cancel, setCancel] = useState(false);
   const date = DateTime.fromISO(a.start_at).setZone(studio.timezone);
   async function change(status: string) {
@@ -55,7 +56,7 @@ export function AppointmentCard({
         <div className="appointment-top">
           <p className="eyebrow">{date.toFormat("h:mm a")} · CENTRAL TIME</p>
           <span className={`status ${a.status}`}>
-            {a.status.replace("_", " ")}
+            {(a.stage ?? a.status).replaceAll("_", " ")}
           </span>
         </div>
         <h3>
@@ -76,7 +77,53 @@ export function AppointmentCard({
             {professionals.find((p) => p.id === a.professional_id)?.name}
           </small>
         )}
+        <p>
+          Payment: {a.payment_status?.replaceAll("_", " ") ?? "not recorded"} ·
+          Deposit {money(a.deposit ?? 0)} · Remaining{" "}
+          {money(a.price - (a.paid ?? 0))}
+        </p>
+        {a.professional_id === "pro-b" && (
+          <p>
+            Intake: {a.intake_id ? "Complete" : "Awaiting intake"}{" "}
+            {a.intake_id && (
+              <button
+                className="text-link"
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    const r = await fetch(`/api/intake?id=${a.intake_id}`);
+                    const d = await r.json();
+                    if (!r.ok) throw new Error(d.error);
+                    setIntake(d.answers);
+                  } catch (e) {
+                    setError(message(e));
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                disabled={busy}
+              >
+                Review confidential intake
+              </button>
+            )}
+          </p>
+        )}
+        {intake && (
+          <details open className="policy-card">
+            <summary>Confidential intake</summary>
+            <p style={{ whiteSpace: "pre-wrap" }}>{intake}</p>
+            <button onClick={() => setIntake("")}>Close intake</button>
+          </details>
+        )}
         <div className="appointment-actions">
+          {staff && <Link className="text-link" href={`/studio/workspace/${a.id}`}>{a.professional_id === "pro-b" ? "Session Mode" : "Chair Mode"} ↗</Link>}
+          {!staff &&
+            a.professional_id === "pro-b" &&
+            a.status === "confirmed" && (
+              <Link href="/recovery/prepare" className="text-link">
+                Prepare your session ↗
+              </Link>
+            )}
           {a.status === "confirmed" ? (
             <>
               <Link href={`/book?reschedule=${a.id}`} className="text-link">
@@ -91,6 +138,25 @@ export function AppointmentCard({
               </button>
               {staff && (
                 <>
+                  {["confirmed", "checked_in"].includes(
+                    a.stage ?? a.status,
+                  ) && (
+                    <button
+                      className="text-link"
+                      disabled={busy || date > DateTime.now()}
+                      onClick={() =>
+                        void change(
+                          (a.stage ?? a.status) === "checked_in"
+                            ? "in_service"
+                            : "checked_in",
+                        )
+                      }
+                    >
+                      {(a.stage ?? a.status) === "checked_in"
+                        ? "Start service"
+                        : "Check in"}
+                    </button>
+                  )}
                   <button
                     disabled={busy || date > DateTime.now()}
                     className="text-link"
@@ -120,8 +186,7 @@ export function AppointmentCard({
         {cancel && (
           <div className="cancel-confirm">
             <p>
-              Cancel this preview appointment? The time will become available
-              again.
+              Cancel this appointment? The time will become available again.
             </p>
             <button
               className="button danger small"

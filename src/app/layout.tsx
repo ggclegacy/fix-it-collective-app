@@ -3,6 +3,8 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import "./globals.css";
 import "./branding.css";
+import "./heritage.css";
+import "./recovery.css";
 export const metadata: Metadata = {
   title: {
     default: "FIX IT COLLECTIVE — Grooming, Beauty & Recovery",

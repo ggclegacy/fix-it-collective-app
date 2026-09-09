@@ -1,6 +1,8 @@
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { WorkspaceNav } from "@/components/workspace-nav";
+import { BusinessNav } from "@/components/business/shell";
+import { scopes } from "@/lib/business/access";
+import "./business-os.css";
 export const dynamic = "force-dynamic";
 export default async function StudioLayout({
   children,
@@ -12,8 +14,18 @@ export default async function StudioLayout({
   if (user.role === "client") redirect("/account");
   return (
     <>
-      <WorkspaceNav staff />
-      <main id="main" className="workspace studio-workspace">
+      <BusinessNav
+        contexts={[
+          ...(user.role === "owner"
+            ? [{ value: "collective", label: "Collective" }]
+            : []),
+          ...scopes(user).map((id) => ({
+            value: id === "pro-a" ? "katie" : "kamilla",
+            label: id === "pro-a" ? "Katie" : "Kamilla",
+          })),
+        ]}
+      />
+      <main id="main" className="workspace studio-workspace os-workspace">
         {children}
       </main>
     </>

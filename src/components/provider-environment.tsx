@@ -1,4 +1,6 @@
+import { rules, settings } from "@/lib/booking-rules";
 import Image from "next/image";
+import { ProviderServiceStory } from "./heritage-story";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -26,7 +28,25 @@ export async function ProviderEnvironment({
   const recovery = provider === "camilla";
   const persistence = !process.env.VERCEL;
   const user = persistence ? await currentUser() : null;
-  const visits = user ? appointmentsFor({ ...user, role: "client" }) : [];
+  const catalog = persistence
+    ? services.map((s) => {
+        const r = rules(s.id);
+        return { ...s, duration: r.duration, price: r.price ?? s.price };
+      })
+    : services;
+  const business = persistence ? settings() : {};
+  const recoveryOpen =
+    persistence &&
+    Boolean(
+      rules("massage").enabled &&
+      business.therapist_license &&
+      business.establishment_license,
+    );
+  const visits = user
+    ? appointmentsFor({ ...user, role: "client" }).filter(
+        (a) => a.professional_id === (recovery ? "pro-b" : "pro-a"),
+      )
+    : [];
   const last = visits
     .filter((a) => a.status === "completed")
     .sort((a, b) => b.start_at.localeCompare(a.start_at))[0];
@@ -112,6 +132,11 @@ export async function ProviderEnvironment({
               : "Considered grooming. A personal ritual. A space to refine the way you show up, with Katie."}
           </p>
           <div className="provider-actions">
+            {recovery && (
+              <Link href="/recovery/prepare" className="provider-button">
+                Prepare your session <ArrowUpRight size={19} />
+              </Link>
+            )}
             <a
               className="provider-button"
               href={recovery ? "#intake" : "#rituals"}
@@ -198,15 +223,14 @@ export async function ProviderEnvironment({
             </p>
           </div>
           <p className="provider-availability">
-            Preview menu · example pricing. Katie’s practitioner schedule is not
-            yet connected.{" "}
+            Service times and booking rules are managed by Katie.{" "}
             {persistence
-              ? "Times below belong to the Collective’s sample professionals."
+              ? "Check the calendar for available appointments."
               : "Online appointment times are not available in this hosted preview."}
           </p>
           <div className="provider-service-list">
-            {services
-              .filter((s) => s.category !== "Color")
+            {catalog
+              .filter((s) => s.brand === "collective" && s.category !== "Color")
               .map((s) => (
                 <article key={s.id} className="provider-service">
                   <span className="provider-service-number">{s.number}</span>
@@ -252,15 +276,25 @@ export async function ProviderEnvironment({
           </div>
           <div className="provider-glass">
             <CalendarDays size={24} />
-            <h3>The Recovery Room menu is being prepared.</h3>
+            <h3>
+              {recoveryOpen
+                ? "Your session with Kamilla."
+                : "The Recovery Room menu is being prepared."}
+            </h3>
             <p>
-              Camilla’s approved treatments, session lengths and availability
-              are being prepared. Recovery Room appointments are not yet open.
+              {recoveryOpen
+                ? `${catalog.find((s) => s.id === "massage")?.duration} minutes · ${money(catalog.find((s) => s.id === "massage")?.price ?? -1)}. Choose your objective and an available time.`
+                : "Kamilla’s approved treatments, session lengths and availability are being prepared. Recovery Room appointments are not yet open."}
             </p>
             <p>
               Your body-area selections help you prepare for a conversation;
               they do not determine a treatment or diagnosis.
             </p>
+            {recoveryOpen && (
+              <Link className="provider-link" href="/book?experience=camilla">
+                Book your session ↗
+              </Link>
+            )}
             <a href="#intake" className="provider-link">
               Prepare your session brief
               <ArrowUpRight size={18} />
@@ -291,6 +325,7 @@ export async function ProviderEnvironment({
           />
         </section>
       )}
+      <ProviderServiceStory provider={provider} />
       <section id="care" className="provider-section provider-care">
         <div className="provider-section-heading">
           <div>
@@ -545,7 +580,10 @@ export async function ProviderEnvironment({
         </Link>
       </div>
       <div className="provider-mobile-action">
-        <a className="provider-button" href={recovery ? "#intake" : "#rituals"}>
+        <a
+          className="provider-button"
+          href={recovery ? "/recovery/prepare" : "#rituals"}
+        >
           {recovery ? "Prepare your session" : "Book Your Chair"}
           <ArrowUpRight size={17} />
         </a>

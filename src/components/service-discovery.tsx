@@ -2,16 +2,24 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { services, money } from "@/lib/catalog";
+import { services, money, type Service } from "@/lib/catalog";
 import { brandForService } from "@/lib/brands";
-export function ServiceDiscovery() {
+export function ServiceDiscovery({
+  catalog = services,
+}: {
+  catalog?: Service[];
+}) {
   const [world, setWorld] = useState("All");
-  const list = services.filter(
+  const list = catalog.filter(
     (s) =>
       world === "All" ||
       (world === "Beauty"
         ? s.category === "Color"
-        : world === "Grooming" && s.category !== "Color"),
+        : world === "Recovery"
+          ? s.brand === "recovery"
+          : world === "Grooming" &&
+            s.brand === "collective" &&
+            s.category !== "Color"),
   );
   return (
     <>

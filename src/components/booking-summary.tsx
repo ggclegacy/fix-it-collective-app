@@ -59,11 +59,13 @@ export function BookingSummary({
             </div>
           ))}
           <div className="summary-total">
-            <span>Preview estimate</span>
+            <span>Service total</span>
             <strong>
               {slot
                 ? money(slot.price)
-                : `from ${money(service.price + addonIds.reduce((n, id) => n + (addons.find((a) => a.id === id)?.price ?? 0), 0))}`}
+                : service.price < 0
+                  ? "Awaiting approval"
+                  : `from ${money(service.price + addonIds.reduce((n, id) => n + (addons.find((a) => a.id === id)?.price ?? 0), 0))}`}
             </strong>
           </div>
         </>

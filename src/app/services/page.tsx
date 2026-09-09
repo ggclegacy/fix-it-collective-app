@@ -1,7 +1,26 @@
+import { rules, settings } from "@/lib/booking-rules";
+import { services } from "@/lib/catalog";
 import Link from "next/link";
 import { ServiceDiscovery } from "@/components/service-discovery";
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Discover your experience" };
 export default function Services() {
+  const b = process.env.VERCEL ? {} : settings();
+  const catalog = process.env.VERCEL
+    ? services.filter((s) => s.brand !== "recovery")
+    : services
+        .filter(
+          (s) =>
+            s.brand !== "recovery" ||
+            (rules(s.id).enabled &&
+              b.therapist_license &&
+              b.establishment_license),
+        )
+        .map((s) => ({
+          ...s,
+          duration: rules(s.id).duration,
+          price: rules(s.id).price ?? s.price,
+        }));
   return (
     <main id="main" className="page section">
       <div className="page-heading">
@@ -29,7 +48,13 @@ export default function Services() {
           Enter Recovery Room ↗
         </Link>
       </div>
-      <ServiceDiscovery />
+      {b.therapist_license && (
+        <p>
+          {b.therapist_name} · Louisiana license {b.therapist_license} ·{" "}
+          {b.establishment_name} {b.establishment_license}
+        </p>
+      )}
+      <ServiceDiscovery catalog={catalog} />
     </main>
   );
 }

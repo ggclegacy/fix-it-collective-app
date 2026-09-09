@@ -19,6 +19,12 @@ export function sameOrigin(request: Request) {
 }
 export async function endpoint(fn: () => unknown | Promise<unknown>) {
   try {
+    if (process.env.VERCEL) {
+      return NextResponse.json(
+        { error: "Online booking and accounts are not open yet." },
+        { status: 503, headers: { "Cache-Control": "no-store" } },
+      );
+    }
     return NextResponse.json(await fn(), {
       headers: { "Cache-Control": "no-store" },
     });

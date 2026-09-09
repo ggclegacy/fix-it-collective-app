@@ -9,8 +9,10 @@ import { AppointmentCard } from "./appointment-card";
 const subscribe = () => () => {};
 export function CalendarView({
   appointments,
+  initialDate,
 }: {
   appointments: Appointment[];
+  initialDate?: string;
 }) {
   const hydrated = useSyncExternalStore(
     subscribe,
@@ -18,15 +20,18 @@ export function CalendarView({
     () => false,
   );
   const [date, setDate] = useState(
-    DateTime.now().setZone(studio.timezone).toISODate()!,
+    initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate) && DateTime.fromISO(initialDate).isValid ? initialDate : DateTime.now().setZone(studio.timezone).toISODate()!,
   );
-  const [view, setView] = useState<"day" | "week">("day");
+  const [view, setView] = useState<"day" | "week" | "agenda">("day");
   const [pro, setPro] = useState("all");
   const day = DateTime.fromISO(date, { zone: studio.timezone });
   const list = appointments.filter(
     (a) =>
       (pro === "all" || pro === a.professional_id) &&
-      DateTime.fromISO(a.start_at).setZone(studio.timezone).hasSame(day, view),
+      (view === "agenda" ||
+        DateTime.fromISO(a.start_at)
+          .setZone(studio.timezone)
+          .hasSame(day, view)),
   );
   return (
     <>
@@ -73,7 +78,7 @@ export function CalendarView({
           value={pro}
           onChange={(e) => setPro(e.target.value)}
         >
-          <option value="all">All professionals</option>
+          <option value="all">Fix It master calendar</option>
           {professionals.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
@@ -81,6 +86,12 @@ export function CalendarView({
           ))}
         </select>
         <div className="segmented">
+          <button
+            aria-pressed={view === "agenda"}
+            onClick={() => setView("agenda")}
+          >
+            Agenda
+          </button>
           <button aria-pressed={view === "day"} onClick={() => setView("day")}>
             Day
           </button>
@@ -92,7 +103,7 @@ export function CalendarView({
           </button>
         </div>
       </div>
-      {view === "day" ? (
+      {view !== "week" ? (
         <div className="day-agenda">
           {list.length ? (
             list.map((a) => (

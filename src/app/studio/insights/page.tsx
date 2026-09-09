@@ -1,3 +1,4 @@
+import { bookingAnalytics } from "@/lib/booking-analytics";
 import { DateTime } from "luxon";
 import { requireUser } from "@/lib/auth";
 import { appointmentsFor } from "@/lib/scheduling";
@@ -5,9 +6,11 @@ import { clients } from "@/lib/staff";
 import { money, services, professionals, studio } from "@/lib/catalog";
 export const metadata = { title: "Studio insights" };
 export default async function Insights() {
-  const all = appointmentsFor(await requireUser(true));
+  const staff = await requireUser(true);
+  const all = appointmentsFor(staff);
   const start = DateTime.now().setZone(studio.timezone).startOf("month");
   const end = start.endOf("month");
+  const metrics = bookingAnalytics(staff, start, end);
   const month = all.filter(
     (a) =>
       DateTime.fromISO(a.start_at) >= start &&
@@ -15,7 +18,7 @@ export default async function Insights() {
   );
   const completed = month.filter((a) => a.status === "completed");
   const value = completed.reduce((s, a) => s + a.price, 0);
-  const eligible = clients().filter((c) => c.visits > 0);
+  const eligible = clients(staff).filter((c) => c.visits > 0);
   const rebooked = eligible.filter((c) => c.next_visit);
   return (
     <>
@@ -31,6 +34,18 @@ export default async function Insights() {
         revenue. Rebooking below uses all completed client history.
       </div>
       <div className="metrics">
+        <div>
+          <span>Calendar utilization (includes reset time)</span>
+          <strong>
+            {metrics.utilization === null
+              ? "No schedule"
+              : `${metrics.utilization}%`}
+          </strong>
+        </div>
+        <div>
+          <span>Net recorded payments for these visits</span>
+          <strong>{money(metrics.revenue)}</strong>
+        </div>
         <div>
           <span>Scheduled service value</span>
           <strong>
@@ -114,9 +129,9 @@ export default async function Insights() {
         </section>
       </div>
       <p className="muted">
-        Utilization, cohort retention, and collected revenue will be added with
-        approved schedules, sufficient visit history, and a connected payment
-        provider.
+        Utilization uses recurring availability minus blocked time. Recorded
+        payments include refunds; a payment adapter must be connected to capture
+        online payments.
       </p>
     </>
   );
