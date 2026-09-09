@@ -4,9 +4,9 @@ import { ArrowUpRight } from "lucide-react";
 export function ExperienceWorlds() {
   return (
     <div className="experience-worlds">
-      <Link className="experience-world collective-world" href="/services">
+      <Link className="experience-world collective-world" href="/grooming">
         <div className="world-identity">
-          <span className="world-index">01 / THE COLLECTIVE</span>
+          <span className="world-index">01 / KATIE’S STUDIO</span>
           <BrandEmblem size={200} decorative />
         </div>
         <div>
@@ -21,7 +21,7 @@ export function ExperienceWorlds() {
           </p>
         </div>
         <span className="world-enter">
-          Explore the collective <ArrowUpRight size={20} />
+          Enter Katie’s Studio <ArrowUpRight size={20} />
         </span>
       </Link>
       <Link className="experience-world recovery-world" href="/recovery">

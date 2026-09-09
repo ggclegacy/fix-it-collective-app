@@ -27,6 +27,7 @@ export function Header() {
         >
           {[
             ["/services", "Experiences"],
+            ["/grooming", "Katie’s Studio"],
             ["/recovery", "Recovery Room"],
             ["/collective", "The collective"],
             ["/men", "Men"],

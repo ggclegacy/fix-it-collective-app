@@ -65,3 +65,7 @@ Persistence and booking/account operations are real **locally**. The brand servi
 Payment processing, deposits, refunds, cards, tips, receipts, email/SMS/push delivery, staff invitations, password recovery, email verification, file uploads, memberships, waitlists, recurring bookings, retail, tax, and discounts are **not implemented as live integrations**. The UI does not pretend they work. No notification is sent and no charge is collected.
 
 See [Architecture](docs/ARCHITECTURE.md) for boundaries and [Launch requirements](docs/LAUNCH.md) for the next phase. See [Partnership elevation](docs/ELEVATION.md) for the September 9 visual update, provisional palette, and missing approved artwork. All design tokens start in `src/app/globals.css`; illustrative catalog and policy configuration live in `src/lib/catalog.ts`.
+
+## Provider environments
+
+Katie’s Studio (`/grooming`) and Recovery Room by Milla (`/recovery`) now have distinct client environments, consultation tools and private preference architecture. See [Provider experiences](docs/PROVIDER-EXPERIENCES.md) for implemented flows, privacy rules and the hosted-storage/approved-content integration boundaries. Live business activation remains pending.

@@ -2,11 +2,16 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 export function sameOrigin(request: Request) {
   const origin = request.headers.get("origin");
-  const allowedOrigins = process.env.APP_ORIGIN
-    ? [new URL(process.env.APP_ORIGIN).origin]
-    : process.env.NODE_ENV === "development"
-      ? ["http://127.0.0.1:3000", "http://localhost:3000"]
+  const requestUrl = new URL(request.url);
+  const localDevelopmentOrigin =
+    process.env.NODE_ENV === "development" &&
+    ["127.0.0.1", "localhost"].includes(requestUrl.hostname)
+      ? [requestUrl.origin]
       : [];
+  const allowedOrigins = [
+    ...(process.env.APP_ORIGIN ? [new URL(process.env.APP_ORIGIN).origin] : []),
+    ...localDevelopmentOrigin,
+  ];
   if (!origin || !allowedOrigins.includes(origin))
     throw new Error("Request origin not allowed.");
   if (!request.headers.get("content-type")?.includes("application/json"))

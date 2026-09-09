@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BookingFlow } from "@/components/booking-flow";
 import { currentUser, demoEnabled } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -13,6 +14,7 @@ export default async function Book({
     professional?: string;
     reschedule?: string;
     client?: string;
+    experience?: string;
   }>;
 }) {
   const q = await searchParams;
@@ -39,6 +41,11 @@ export default async function Book({
   }
   return (
     <main id="main" className="booking-page">
+      {q.experience === "katie" && (
+        <Link href="/grooming" className="text-link">
+          ← Back to Katie’s Studio
+        </Link>
+      )}
       <BookingFlow
         key={appointment?.id ?? "new"}
         user={user}

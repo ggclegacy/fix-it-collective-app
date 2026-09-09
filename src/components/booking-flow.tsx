@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DateTime } from "luxon";
 import { ArrowLeft, ArrowRight, Check, CalendarDays } from "lucide-react";
+import {
+  consultationSummary,
+  type ProviderProfile,
+} from "@/lib/provider-profiles";
 import { services, professionals, policy, studio } from "@/lib/catalog";
 import type { Appointment, Slot, User } from "@/lib/types";
 import { api, message } from "@/lib/client";
@@ -88,6 +92,29 @@ export function BookingFlow({
     professionalId === "any"
       ? slots.filter((s, i, a) => a.findIndex((x) => x.start === s.start) === i)
       : slots;
+  async function useStyleBrief() {
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch("/api/provider-profile?provider=katie", {
+        cache: "no-store",
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      if (!data.saved)
+        throw new Error("Save your Grooming DNA in Katie’s Studio first.");
+      setIntake(
+        consultationSummary(data.saved.profile as ProviderProfile).slice(
+          0,
+          2000,
+        ),
+      );
+    } catch (e) {
+      setError(message(e));
+    } finally {
+      setBusy(false);
+    }
+  }
   async function confirm() {
     if (!slot) return;
     setBusy(true);
@@ -302,6 +329,22 @@ export function BookingFlow({
                     rows={4}
                   />
                 </label>
+                {!client && (
+                  <div className="notice">
+                    <button
+                      type="button"
+                      className="text-link"
+                      disabled={busy}
+                      onClick={useStyleBrief}
+                    >
+                      Use my saved grooming brief
+                    </button>
+                    <p>
+                      This replaces the notes above. Review before confirming:
+                      booking shares these notes with studio staff.
+                    </p>
+                  </div>
+                )}
                 <div className="policy-card">
                   <h3>A note before you book</h3>
                   <p>{policy.text}</p>

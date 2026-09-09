@@ -4057,3 +4057,10 @@ input[type="checkbox"] {
     top: 100%;
   }
 }
+
+.provider-entry-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 24px 0 40px;
+}
