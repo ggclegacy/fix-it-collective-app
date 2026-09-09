@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import "./globals.css";
+import "./branding.css";
 export const metadata: Metadata = {
   title: {
     default: "FIX IT COLLECTIVE — Grooming, Beauty & Recovery",
@@ -11,9 +12,10 @@ export const metadata: Metadata = {
     "Fix It Collective and Recovery Room by Milla. Distinct grooming, beauty and wellness experiences in one connected collective.",
   applicationName: "Fix It Collective",
   manifest: "/manifest.webmanifest",
+  icons: { icon: "/brand/icon-32.png", apple: "/brand/icon-180.png" },
 };
 export const viewport: Viewport = {
-  themeColor: "#122a3c",
+  themeColor: "#061a2c",
   width: "device-width",
   initialScale: 1,
 };

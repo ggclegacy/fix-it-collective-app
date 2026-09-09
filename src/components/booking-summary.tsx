@@ -1,3 +1,4 @@
+import { BrandEmblem } from "./brand-emblem";
 import { Clock3, CalendarDays } from "lucide-react";
 import { DateTime } from "luxon";
 import { services, professionals, addons, money, studio } from "@/lib/catalog";
@@ -17,7 +18,10 @@ export function BookingSummary({
   return (
     <aside className="booking-summary">
       <p className="eyebrow">YOUR VISIT, AT A GLANCE</p>
-      <div className="visit-brand">{brandForService(service).name}</div>
+      <div className="visit-brand">
+        <BrandEmblem brand={service?.brand} size={72} decorative />
+        {brandForService(service).name}
+      </div>
       <h3>{service?.name ?? "A little time for you."}</h3>
       <p>
         {service

@@ -1,9 +1,9 @@
 import Link from "next/link";
-// Text identification only until the approved original artwork is available.
-// Never substitute an invented emblem for either official mark.
+import { BrandEmblem } from "./brand-emblem";
 export function Brand() {
   return (
     <Link className="brand" href="/" aria-label="Fix It Collective home">
+      <BrandEmblem size={64} decorative eager />
       <span>
         FIX IT COLLECTIVE<span className="brand-sub">EUNICE, LOUISIANA</span>
       </span>

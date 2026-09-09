@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PartnershipMarks } from "@/components/partnership-marks";
 import { professionals } from "@/lib/catalog";
 export const metadata = { title: "The collective" };
 export default function Collective() {
@@ -11,6 +12,7 @@ export default function Collective() {
           <br />
           <em>Starting with you.</em>
         </h1>
+        <PartnershipMarks />
         <div className="editorial-columns">
           <h2>
             A shared space.

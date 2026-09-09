@@ -1,3 +1,4 @@
+import { BrandEmblem } from "./brand-emblem";
 import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { DateTime } from "luxon";
@@ -36,6 +37,7 @@ export function BookingConfirmation({
       </h1>
       <p>Your preview appointment is saved. No charge has been made.</p>
       <div className="confirmation-summary">
+        <BrandEmblem brand={service?.brand} size={96} />
         <p className="brand-label">{brandForService(service).name}</p>
         <h3>{service?.name}</h3>
         <p>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandEmblem } from "@/components/brand-emblem";
 import { ArrowUpRight, ArrowLeft } from "lucide-react";
 export const metadata = {
   title: "Recovery Room by Milla",
@@ -12,6 +13,9 @@ export default function Recovery() {
         <Link href="/#experiences" className="text-link">
           <ArrowLeft size={16} /> The partnership
         </Link>
+        <div className="recovery-emblem">
+          <BrandEmblem brand="recovery" size={360} eager />
+        </div>
         <p className="eyebrow">
           RECOVERY ROOM <span className="by-milla">by Milla</span>
         </p>

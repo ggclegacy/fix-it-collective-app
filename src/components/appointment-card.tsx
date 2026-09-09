@@ -1,4 +1,5 @@
 "use client";
+import { BrandEmblem } from "./brand-emblem";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -43,7 +44,12 @@ export function AppointmentCard({
         <span>{date.toFormat("ccc")}</span>
       </div>
       <div className="appointment-content">
-        <p className="brand-label">
+        <p className="brand-label appointment-brand">
+          <BrandEmblem
+            brand={services.find((s) => s.id === a.service_id)?.brand}
+            size={36}
+            decorative
+          />
           {brandForService(services.find((s) => s.id === a.service_id)).name}
         </p>
         <div className="appointment-top">

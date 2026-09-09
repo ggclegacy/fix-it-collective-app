@@ -7,7 +7,20 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/account",
     display: "standalone",
     background_color: "#081520",
-    theme_color: "#122a3c",
-    icons: [], // Approved emblem required before installing a brand icon.
+    theme_color: "#061a2c",
+    icons: [
+      {
+        src: "/brand/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/brand/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+    ],
   };
 }

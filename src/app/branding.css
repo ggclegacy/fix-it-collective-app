@@ -1,0 +1,242 @@
+/* Sample-derived approved brand palette. See docs/BRANDING.md for provenance. */
+:root {
+  --blue-950: #061522;
+  --blue-900: #061a2c;
+  --blue-800: #0d2338;
+  --blue-700: #213746;
+  --blue-600: #304d62;
+  --gold-700: #a0784a;
+  --gold-500: #c79b63;
+  --gold-300: #eddcb9;
+  --cream-100: #e3d1bd;
+  --cream-300: #cfbba4;
+  --material-gold: linear-gradient(110deg, #c79b63, #eddcb9 48%, #c79b63);
+}
+
+.brand-emblem {
+  display: block;
+  flex-shrink: 0;
+  object-fit: contain;
+  max-width: 100%;
+  height: auto;
+}
+.brand {
+  gap: 16px;
+  letter-spacing: 0.12em;
+}
+.brand > .brand-emblem {
+  width: 64px;
+  height: 64px;
+}
+.site-header {
+  min-height: 104px;
+  height: auto;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.entrance {
+  background:
+    radial-gradient(ellipse at 78% 20%, #304d6280, transparent 55%),
+    linear-gradient(
+      115deg,
+      var(--blue-950) 25%,
+      var(--blue-800) 70%,
+      var(--blue-900)
+    );
+}
+.world-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+}
+.world-identity .brand-emblem {
+  align-self: center;
+  filter: drop-shadow(0 16px 22px #0005);
+  transition: transform var(--duration-panel) var(--curve);
+}
+.experience-world:hover .brand-emblem {
+  transform: translateY(-3px);
+}
+.collective-world {
+  background:
+    radial-gradient(ellipse at 50% 25%, #304d6255, transparent 60%),
+    var(--blue-900);
+}
+.recovery-world {
+  background:
+    radial-gradient(ellipse at 50% 25%, #e3d1bd16, transparent 60%), #213746;
+}
+.experience-world h3 {
+  font-size: clamp(38px, 3.8vw, 55px);
+}
+.experience-world .eyebrow {
+  margin-top: 30px;
+}
+.partnership-marks {
+  display: grid;
+  grid-template-columns: 1fr 70px 1fr;
+  align-items: center;
+  padding: 48px;
+  margin: 52px 0;
+  border-block: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse at 25% 45%, #0d2338, transparent 45%),
+    radial-gradient(ellipse at 75% 45%, #21374688, transparent 45%);
+}
+.partnership-marks a {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: center;
+  text-align: center;
+}
+.partnership-marks a > span {
+  font-size: 12px;
+  letter-spacing: 0.13em;
+  color: var(--steel-300);
+}
+.partnership-marks .brand-emblem {
+  filter: drop-shadow(0 15px 28px #0005);
+}
+.partnership-connector {
+  font: 32px var(--font-display);
+  color: var(--gold-light);
+  text-align: center;
+}
+.recovery-intro {
+  position: relative;
+}
+.recovery-intro > h1,
+.recovery-intro > .recovery-lede {
+  max-width: 62%;
+}
+.recovery-emblem {
+  position: absolute;
+  right: 6%;
+  top: 24%;
+  width: 29%;
+  max-width: 360px;
+  filter: drop-shadow(0 20px 36px #0005);
+}
+.recovery-environment {
+  background:
+    radial-gradient(ellipse at 85% 15%, #304d62aa, transparent 50%),
+    var(--blue-700);
+}
+.recovery-details {
+  background: var(--cream-100);
+}
+.visit-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+.appointment-content > .appointment-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gold-light);
+}
+.appointment-brand .brand-emblem {
+  width: 36px;
+  height: 36px;
+}
+.confirmation-summary > .brand-emblem {
+  margin: 0 auto 20px;
+}
+.footer .brand > .brand-emblem {
+  width: 72px;
+  height: 72px;
+}
+@media (min-width: 1100px) {
+  .world-identity {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .world-index {
+    max-width: 160px;
+    line-height: 1.8;
+  }
+  .world-identity .brand-emblem {
+    width: 176px;
+  }
+}
+@media (max-width: 1100px) {
+  .site-header .brand {
+    font-size: 12px;
+    gap: 10px;
+  }
+  .site-header .brand-sub {
+    font-size: 9px;
+  }
+  .site-header .brand > .brand-emblem {
+    width: 52px;
+    height: 52px;
+  }
+}
+@media (max-width: 760px) {
+  .site-header {
+    min-height: 86px;
+  }
+  .site-header .brand {
+    font-size: 12px;
+    max-width: calc(100% - 58px);
+  }
+  .site-header .brand-sub {
+    letter-spacing: 0.12em;
+  }
+  .partnership-marks {
+    grid-template-columns: 1fr;
+    padding: 30px 16px;
+    gap: 28px;
+  }
+  .partnership-marks .brand-emblem {
+    width: 220px;
+  }
+  .recovery-emblem {
+    position: static;
+    width: 200px;
+    margin: 32px auto;
+  }
+  .recovery-intro > h1,
+  .recovery-intro > .recovery-lede {
+    max-width: 100%;
+  }
+  .recovery-intro > .eyebrow {
+    margin-top: 28px;
+  }
+  .world-identity {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  .world-identity .brand-emblem {
+    width: 130px;
+  }
+  .world-index {
+    max-width: 140px;
+    font-size: 11px;
+    line-height: 1.8;
+  }
+  .booking-summary .visit-brand {
+    grid-column: 1/-1;
+    flex-direction: row;
+    align-items: center;
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+  .booking-summary .visit-brand .brand-emblem {
+    width: 56px;
+  }
+  .footer .brand {
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experience-world:hover .brand-emblem {
+    transform: none;
+  }
+}

@@ -1,10 +1,14 @@
 import Link from "next/link";
+import { BrandEmblem } from "./brand-emblem";
 import { ArrowUpRight } from "lucide-react";
 export function ExperienceWorlds() {
   return (
     <div className="experience-worlds">
       <Link className="experience-world collective-world" href="/services">
-        <span className="world-index">01 / THE COLLECTIVE</span>
+        <div className="world-identity">
+          <span className="world-index">01 / THE COLLECTIVE</span>
+          <BrandEmblem size={200} decorative />
+        </div>
         <div>
           <p className="eyebrow">FIX IT COLLECTIVE</p>
           <h3>
@@ -21,7 +25,10 @@ export function ExperienceWorlds() {
         </span>
       </Link>
       <Link className="experience-world recovery-world" href="/recovery">
-        <span className="world-index">02 / RECOVERY ROOM BY MILLA</span>
+        <div className="world-identity">
+          <span className="world-index">02 / RECOVERY ROOM BY MILLA</span>
+          <BrandEmblem brand="recovery" size={200} decorative />
+        </div>
         <div>
           <p className="eyebrow">MIND · BODY · BALANCE</p>
           <h3>
