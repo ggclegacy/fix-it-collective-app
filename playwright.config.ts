@@ -4,6 +4,8 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   timeout: 180000,
+  // Local Next.js routes compile on first visit; allow that before asserting UI.
+  expect: { timeout: 15000 },
   webServer: {
     command: "npm run dev",
     url: "http://127.0.0.1:3000",
