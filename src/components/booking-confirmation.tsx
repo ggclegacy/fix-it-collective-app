@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { DateTime } from "luxon";
 import { services, professionals, studio } from "@/lib/catalog";
+import { brandForService } from "@/lib/brands";
 import type { Slot, User, Appointment } from "@/lib/types";
 export function BookingConfirmation({
   service,
@@ -35,6 +36,7 @@ export function BookingConfirmation({
       </h1>
       <p>Your preview appointment is saved. No charge has been made.</p>
       <div className="confirmation-summary">
+        <p className="brand-label">{brandForService(service).name}</p>
         <h3>{service?.name}</h3>
         <p>
           {DateTime.fromISO(slot.start)

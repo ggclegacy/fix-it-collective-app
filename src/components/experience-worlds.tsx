@@ -1,0 +1,43 @@
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+export function ExperienceWorlds() {
+  return (
+    <div className="experience-worlds">
+      <Link className="experience-world collective-world" href="/services">
+        <span className="world-index">01 / THE COLLECTIVE</span>
+        <div>
+          <p className="eyebrow">FIX IT COLLECTIVE</p>
+          <h3>
+            The art of
+            <br />
+            <em>showing up.</em>
+          </h3>
+          <p>
+            Grooming & beauty. Personal expression, down to the last detail.
+          </p>
+        </div>
+        <span className="world-enter">
+          Explore the collective <ArrowUpRight size={20} />
+        </span>
+      </Link>
+      <Link className="experience-world recovery-world" href="/recovery">
+        <span className="world-index">02 / RECOVERY ROOM BY MILLA</span>
+        <div>
+          <p className="eyebrow">MIND · BODY · BALANCE</p>
+          <h3>
+            Make room
+            <br />
+            <em>for yourself.</em>
+          </h3>
+          <p>
+            Massage, bodywork & wellness. A distinct space within the
+            collective.
+          </p>
+        </div>
+        <span className="world-enter">
+          Enter Recovery Room <ArrowUpRight size={20} />
+        </span>
+      </Link>
+    </div>
+  );
+}

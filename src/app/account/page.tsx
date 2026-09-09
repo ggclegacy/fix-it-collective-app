@@ -12,6 +12,7 @@ export default async function Account() {
   const history = appointments
     .filter((a) => a.status !== "confirmed")
     .reverse();
+  const lastCompleted = history.find((a) => a.status === "completed");
   const notes = db()
     .prepare(
       "SELECT body,created_at FROM notes WHERE client_id=? AND visibility='client' ORDER BY created_at DESC",
@@ -21,9 +22,9 @@ export default async function Account() {
     <>
       <div className="workspace-heading">
         <div>
-          <p className="eyebrow">YOUR SPACE AT FIX IT</p>
+          <p className="eyebrow">YOUR PERSONAL COLLECTIVE</p>
           <h1>Hey, {user.name.split(" ")[0]}.</h1>
-          <p>Make a little room for feeling good.</p>
+          <p>Your visits. Your preferences. Your time.</p>
         </div>
         <Link className="button navy" href="/book">
           Book a visit <ArrowUpRight size={18} />
@@ -32,7 +33,7 @@ export default async function Account() {
       <div className="account-grid">
         <section>
           <div className="list-heading">
-            <h2>On your calendar</h2>
+            <h2>Your next visit</h2>
             <span>{upcoming.length} visits</span>
           </div>
           {upcoming.length ? (
@@ -75,8 +76,8 @@ export default async function Account() {
             <Link
               className="button gold full"
               href={
-                history[0]
-                  ? `/book?service=${history[0].service_id}&professional=${history[0].professional_id}`
+                lastCompleted
+                  ? `/book?service=${lastCompleted.service_id}&professional=${lastCompleted.professional_id}`
                   : "/book"
               }
             >

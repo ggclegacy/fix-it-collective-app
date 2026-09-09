@@ -19,14 +19,14 @@ export default function Collective() {
           </h2>
           <div>
             <p>
-              Fix It Collective brings grooming and personal care into one
+              Fix It Collective brings beauty, grooming and community into one
               connected experience. A place to discover your people, find your
               routine, and feel at home in your own style.
             </p>
             <p>
-              Our vision reaches beyond one service or one chair. It’s a
-              collective built for the way you live, with thoughtful care at its
-              center.
+              Recovery Room by Milla brings its own identity to massage,
+              bodywork and wellness within the partnership. Both brands share
+              one connected appointment experience.
             </p>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Appointment } from "@/lib/types";
 import { professionals, services, studio } from "@/lib/catalog";
+import { brandForService } from "@/lib/brands";
 import { AppointmentCard } from "./appointment-card";
 const subscribe = () => () => {};
 export function CalendarView({
@@ -141,6 +142,13 @@ export function CalendarView({
                         .toFormat("h:mm a")}
                     </span>
                     <strong>{a.client_name}</strong>
+                    <small>
+                      {
+                        brandForService(
+                          services.find((s) => s.id === a.service_id),
+                        ).short
+                      }
+                    </small>
                     <small>
                       {services.find((s) => s.id === a.service_id)?.name}
                     </small>

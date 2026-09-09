@@ -125,6 +125,7 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
     for (const route of [
       "/",
       "/services",
+      "/recovery",
       "/collective",
       "/policies",
       "/book",
@@ -148,9 +149,9 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
           .map((v) => ({ id: v.id, nodes: v.nodes.map((n) => n.target) })),
         `${width} ${route}`,
       ).toEqual([]);
-      if (route === "/" || route === "/book")
+      if (route === "/" || route === "/book" || route === "/recovery")
         await page.screenshot({
-          path: `/tmp/fic-${route === "/" ? "home" : "booking"}-${width}.png`,
+          path: `/tmp/fic-${route === "/" ? "home" : route === "/recovery" ? "recovery" : "booking"}-${width}.png`,
           fullPage: width === 390,
         });
     }
@@ -226,4 +227,30 @@ test("client visits and preferences work at desktop and phone sizes", async ({
         });
     }
   }
+});
+
+test("partner discovery preserves identity and does not invent bookable recovery services", async ({
+  page,
+}) => {
+  await page.goto("/services");
+  await page.getByRole("button", { name: "Recovery", exact: true }).click();
+  await expect(
+    page.getByText("RECOVERY ROOM BY MILLA", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Discover Recovery Room" }).click();
+  await expect(page).toHaveURL(/recovery/);
+  await expect(
+    page.getByText("The Recovery Room menu is being prepared."),
+  ).toBeVisible();
+  await page.goto("/book?service=signature-cut");
+  await page.getByRole("button", { name: "Recovery", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Continue", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Beauty", exact: true }).click();
+  await page.getByRole("button", { name: /Color consultation/ }).click();
+  await expect(page.locator(".visit-brand")).toHaveText("Fix It Collective");
+  await expect(
+    page.getByRole("button", { name: "Continue", exact: true }),
+  ).toBeEnabled();
 });

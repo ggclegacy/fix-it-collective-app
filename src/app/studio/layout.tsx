@@ -13,7 +13,7 @@ export default async function StudioLayout({
   return (
     <>
       <WorkspaceNav staff />
-      <main id="main" className="workspace">
+      <main id="main" className="workspace studio-workspace">
         {children}
       </main>
     </>

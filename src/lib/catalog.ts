@@ -18,6 +18,7 @@ export const services = [
   {
     id: "signature-cut",
     name: "The signature cut",
+    brand: "collective",
     category: "Hair",
     description:
       "A considered cut, shaped around your texture, routine, and personal style. Consultation, wash, cut, and finish.",
@@ -30,6 +31,7 @@ export const services = [
   {
     id: "cut-beard",
     name: "Cut & beard ritual",
+    brand: "collective",
     category: "Grooming",
     description:
       "A complete refresh. A tailored cut paired with precise beard shaping and a considered finish.",
@@ -42,6 +44,7 @@ export const services = [
   {
     id: "beard",
     name: "Beard detailing",
+    brand: "collective",
     category: "Grooming",
     description:
       "Refined lines, balanced shape, and thoughtful attention to the details that make it yours.",
@@ -54,6 +57,7 @@ export const services = [
   {
     id: "color",
     name: "Color consultation",
+    brand: "collective",
     category: "Color",
     description:
       "Make a plan together. Explore your goals, upkeep, and the right approach before a color service.",

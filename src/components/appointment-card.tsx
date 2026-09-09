@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { DateTime } from "luxon";
 import { ArrowUpRight, CalendarDays } from "lucide-react";
 import { services, professionals, studio, money } from "@/lib/catalog";
+import { brandForService } from "@/lib/brands";
 import type { Appointment } from "@/lib/types";
 import { api, message } from "@/lib/client";
 export function AppointmentCard({
@@ -42,6 +43,9 @@ export function AppointmentCard({
         <span>{date.toFormat("ccc")}</span>
       </div>
       <div className="appointment-content">
+        <p className="brand-label">
+          {brandForService(services.find((s) => s.id === a.service_id)).name}
+        </p>
         <div className="appointment-top">
           <p className="eyebrow">{date.toFormat("h:mm a")} · CENTRAL TIME</p>
           <span className={`status ${a.status}`}>

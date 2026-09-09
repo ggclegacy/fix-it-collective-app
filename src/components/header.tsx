@@ -23,7 +23,8 @@ export function Header() {
         aria-label="Main navigation"
       >
         {[
-          ["/services", "The services"],
+          ["/services", "Experiences"],
+          ["/recovery", "Recovery Room"],
           ["/collective", "The collective"],
           ["/account", "Your space"],
         ].map(([href, label]) => (

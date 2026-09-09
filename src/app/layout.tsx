@@ -4,17 +4,16 @@ import { Footer } from "@/components/footer";
 import "./globals.css";
 export const metadata: Metadata = {
   title: {
-    default: "FIX IT COLLECTIVE — Made for your everyday.",
+    default: "FIX IT COLLECTIVE — Grooming, Beauty & Recovery",
     template: "%s | FIX IT COLLECTIVE",
   },
   description:
-    "A considered approach to grooming, personal care, and the way you show up.",
+    "Fix It Collective and Recovery Room by Milla. Distinct grooming, beauty and wellness experiences in one connected collective.",
   applicationName: "Fix It Collective",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg", apple: "/icon.svg" },
 };
 export const viewport: Viewport = {
-  themeColor: "#102b46",
+  themeColor: "#122a3c",
   width: "device-width",
   initialScale: 1,
 };

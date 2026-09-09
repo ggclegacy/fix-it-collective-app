@@ -1,24 +1,49 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap");
+/* Provisional art direction. Exact logo sampling requires the approved originals. */
 :root {
-  --navy: #102b46;
-  --navy-deep: #0b2034;
-  --blue: #21476b;
-  --blue-bright: #325d83;
-  --gold: #c9a66a;
-  --gold-light: #e0c28d;
-  --ink: #142b40;
-  --muted: #4d6071;
-  --paper: #f5f6f7;
-  --white: #fff;
-  --line: #dce2e7;
-  --radius: 6px;
-  --radius-lg: 12px;
-  --font-body: "DM Sans", Arial, sans-serif;
-  --font-display: "Manrope", Arial, sans-serif;
+  color-scheme: dark;
+  --blue-950: #081520;
+  --blue-900: #0d2030;
+  --blue-800: #122a3c;
+  --blue-700: #1d3a50;
+  --blue-600: #304d62;
+  --gold-700: #8b683b;
+  --gold-500: #c5a16a;
+  --gold-300: #e0c391;
+  --cream-100: #f3ead8;
+  --cream-300: #d8cbb6;
+  --steel-300: #bac9d2;
+  --steel-500: #7e929f;
+  --steel-700: #354c5d;
+  --navy: var(--blue-800);
+  --navy-deep: var(--blue-950);
+  --blue: var(--blue-700);
+  --blue-bright: var(--blue-600);
+  --gold: var(--gold-500);
+  --gold-light: var(--gold-300);
+  --ink: var(--cream-100);
+  --muted: var(--steel-300);
+  --paper: var(--blue-950);
+  --white: var(--cream-100);
+  --line: var(--steel-700);
+  --radius: 3px;
+  --radius-lg: 8px;
+  --font-body: "Avenir Next", "Segoe UI", Arial, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --space: 8px;
-  --ease: 180ms ease;
-  --shadow: 0 14px 44px #102b4609;
+  --space-section: clamp(64px, 8vw, 128px);
+  --duration-fast: 220ms;
+  --duration-panel: 600ms;
+  --duration-entrance: 1100ms;
+  --curve: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease: var(--duration-fast) var(--curve);
+  --shadow: 0 24px 64px #00000030;
+  --reflection: #dbe9f00b;
+  --material-panel:
+    linear-gradient(125deg, var(--reflection), transparent 40%), var(--blue-900);
+  --material-gold: linear-gradient(110deg, #c5a16a, #e0c391 48%, #b9945b);
+  --edge: inset 0 1px 0 #dbe9f018;
 }
+
 * {
   box-sizing: border-box;
 }
@@ -68,11 +93,11 @@ select,
 textarea {
   width: 100%;
   min-height: 48px;
-  border: 1px solid #b9c5cf;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 11px 13px;
   color: var(--ink);
-  background: white;
+  background: var(--blue-900);
   max-width: 100%;
 }
 input[type="checkbox"] {
@@ -144,14 +169,14 @@ small {
 }
 ::selection {
   background: var(--gold-light);
-  color: var(--navy);
+  color: var(--cream-100);
 }
 .skip-link {
   position: fixed;
   left: 16px;
   top: -100px;
   background: var(--gold);
-  color: var(--navy);
+  color: var(--cream-100);
   z-index: 100;
   padding: 12px 20px;
 }
@@ -262,11 +287,11 @@ small {
 }
 .button.outline {
   background: transparent;
-  border-color: #adbac5;
-  color: var(--navy);
+  border-color: var(--line);
+  color: var(--cream-100);
 }
 .button.outline:hover {
-  background: #e7edf2;
+  background: var(--blue-900);
 }
 .button.danger {
   background: #87372b;
@@ -427,7 +452,7 @@ small {
   gap: 100px;
   padding: 25px 5%;
   border-bottom: 1px solid var(--line);
-  background: #eef1f4;
+  background: var(--blue-900);
 }
 .principles span {
   font-size: 12px;
@@ -437,7 +462,7 @@ small {
   gap: 13px;
 }
 .principles svg {
-  color: #96723b;
+  color: var(--steel-300);
 }
 .section {
   max-width: 1440px;
@@ -478,13 +503,13 @@ small {
     padding var(--ease);
 }
 .service-row:hover {
-  background: #eaf0f4;
+  background: var(--blue-900);
   padding-left: 20px;
 }
 .service-number {
   font-family: Georgia, serif;
   font-size: 18px;
-  color: #755a2e;
+  color: var(--steel-300);
 }
 .service-row .eyebrow {
   font-size: 9px;
@@ -546,8 +571,8 @@ small {
   color: var(--muted);
 }
 .routine-card {
-  background: #e8edf2;
-  border: 1px solid #d5dee7;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
   padding: 40px;
 }
 .routine-card .eyebrow {
@@ -558,7 +583,7 @@ small {
   margin-bottom: 30px;
 }
 .routine-card p {
-  border-top: 1px solid #cad5de;
+  border-top: 1px solid var(--line);
   display: flex;
   gap: 20px;
   padding-top: 16px;
@@ -567,7 +592,7 @@ small {
 }
 .routine-card p span {
   font-family: Georgia, serif;
-  color: #755a2e;
+  color: var(--steel-300);
 }
 .footer {
   background: var(--navy-deep);
@@ -600,9 +625,9 @@ small {
   color: var(--muted);
 }
 .notice {
-  background: #eaf0f5;
-  border: 1px solid #c9d7e3;
-  border-left: 3px solid #5e7f9e;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
   padding: 14px 18px;
   font-size: 14px;
   line-height: 1.7;
@@ -616,7 +641,7 @@ small {
 }
 .service-card {
   border: 1px solid var(--line);
-  background: white;
+  background: var(--blue-900);
   padding: 34px;
   display: flex;
   flex-direction: column;
@@ -682,7 +707,7 @@ small {
 }
 .team-placeholder {
   height: 280px;
-  background: #e0e7ee;
+  background: var(--blue-900);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -693,7 +718,7 @@ small {
   font:
     110px Georgia,
     serif;
-  color: #718ba1;
+  color: var(--steel-300);
 }
 .team-placeholder small {
   font-size: 10px;
@@ -738,7 +763,7 @@ small {
   font:
     65px Georgia,
     serif;
-  color: #647d91;
+  color: var(--steel-300);
   letter-spacing: -0.1em;
   margin-top: 40px;
 }
@@ -755,7 +780,7 @@ small {
 }
 .segmented {
   display: flex;
-  background: #e6ebef;
+  background: var(--blue-900);
   padding: 4px;
   gap: 3px;
   border-radius: var(--radius);
@@ -770,7 +795,7 @@ small {
   white-space: nowrap;
 }
 .segmented button[aria-pressed="true"] {
-  background: white;
+  background: var(--blue-900);
   box-shadow: 0 2px 5px #102b4610;
 }
 .demo-entry {
@@ -787,9 +812,9 @@ small {
 }
 .error {
   padding: 14px;
-  background: #f8ebe8;
-  border: 1px solid #e8b9b0;
-  color: #813a2f;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
+  color: var(--steel-300);
   font-size: 14px;
   margin-top: 16px;
   border-radius: var(--radius);
@@ -852,13 +877,13 @@ small {
   justify-content: center;
   width: 25px;
   height: 25px;
-  border: 1px solid #c2cdd6;
+  border: 1px solid var(--line);
   border-radius: 50%;
   font-size: 11px;
 }
 .steps .active button,
 .steps .done button {
-  color: var(--navy);
+  color: var(--cream-100);
 }
 .steps .active button > span,
 .steps .done button > span {
@@ -898,7 +923,7 @@ small {
 }
 .selection {
   width: 100%;
-  background: white;
+  background: var(--blue-900);
   border: 1px solid var(--line);
   padding: 22px;
   display: flex;
@@ -911,11 +936,11 @@ small {
     background var(--ease);
 }
 .selection:hover {
-  border-color: #7c96ac;
+  border-color: var(--line);
 }
 .selection.selected {
   border-color: var(--navy);
-  background: #eaf0f5;
+  background: var(--blue-900);
   box-shadow: inset 0 0 0 1px var(--navy);
 }
 .selection h3 {
@@ -936,7 +961,7 @@ small {
 .radio-dot {
   width: 22px;
   height: 22px;
-  border: 1px solid #b8c7d3;
+  border: 1px solid var(--line);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -969,14 +994,14 @@ small {
 }
 .addon {
   margin-top: 24px;
-  background: #edf1f4;
+  background: var(--blue-900);
   padding: 20px;
   border-radius: var(--radius);
 }
 .booking-summary {
   padding: 30px;
-  background: #e9eef3;
-  border: 1px solid #dbe3ea;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
   position: sticky;
   top: 24px;
   border-radius: var(--radius);
@@ -987,8 +1012,8 @@ small {
 .summary-monogram {
   font-family: Georgia, serif;
   font-size: 42px;
-  color: #6a879f;
-  border-bottom: 1px solid #cbd6df;
+  color: var(--steel-300);
+  border-bottom: 1px solid var(--line);
   margin-bottom: 25px;
   padding-bottom: 18px;
   letter-spacing: -0.08em;
@@ -1012,7 +1037,7 @@ small {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  border-top: 1px solid #cbd6df;
+  border-top: 1px solid var(--line);
   padding-top: 20px;
   margin: 24px 0;
   font-size: 12px;
@@ -1057,14 +1082,14 @@ small {
 }
 .slots button {
   min-height: 48px;
-  background: white;
-  border: 1px solid #b9c8d5;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   font-size: 13px;
   padding: 8px;
 }
 .slots button:hover {
-  background: #e7edf3;
+  background: var(--blue-900);
 }
 .slots button.selected {
   background: var(--navy);
@@ -1074,17 +1099,17 @@ small {
 .empty-state {
   padding: 40px 28px;
   text-align: center;
-  border: 1px dashed #bfccd6;
+  border: 1px dashed var(--line);
   border-radius: var(--radius);
   color: var(--muted);
-  background: #f0f3f6;
+  background: var(--blue-900);
 }
 .empty-state > svg {
-  color: #748ea4;
+  color: var(--steel-300);
   margin-bottom: 16px;
 }
 .empty-state h3 {
-  color: var(--navy);
+  color: var(--cream-100);
   font-size: 24px;
 }
 .empty-state p {
@@ -1122,16 +1147,16 @@ small {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #dfe8ef;
-  border: 1px solid #ccd9e3;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
   border-radius: 50%;
   font-size: 14px;
   font-weight: 600;
-  color: var(--blue);
+  color: var(--steel-300);
 }
 .policy-card {
   padding: 22px;
-  background: #edf1f5;
+  background: var(--blue-900);
   border-radius: var(--radius);
   margin-bottom: 24px;
 }
@@ -1167,8 +1192,8 @@ small {
   justify-content: center;
   width: 78px;
   height: 78px;
-  background: #e2ece8;
-  color: #356951;
+  background: var(--blue-900);
+  color: var(--steel-300);
   border-radius: 50%;
 }
 .workspace-nav {
@@ -1178,7 +1203,7 @@ small {
   padding: 0 5%;
   min-height: 73px;
   border-bottom: 1px solid var(--line);
-  background: white;
+  background: var(--blue-900);
 }
 .workspace-label {
   font-size: 10px;
@@ -1198,12 +1223,12 @@ small {
   white-space: nowrap;
 }
 .workspace-nav > a.active {
-  background: #eaf0f5;
-  color: var(--navy);
+  background: var(--blue-900);
+  color: var(--cream-100);
   font-weight: 600;
 }
 .workspace-nav > a:hover {
-  background: #f0f3f6;
+  background: var(--blue-900);
 }
 .signout {
   margin-left: auto;
@@ -1272,7 +1297,7 @@ small {
 }
 .appointment-card {
   display: flex;
-  background: white;
+  background: var(--blue-900);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 24px;
@@ -1325,24 +1350,24 @@ small {
   font-size: 10px;
   padding: 3px 8px;
   border-radius: 3px;
-  background: #e8eef3;
-  color: #49667d;
+  background: var(--blue-900);
+  color: var(--steel-300);
   text-transform: capitalize;
   white-space: nowrap;
   display: inline-block;
 }
 .status.confirmed {
-  background: #e8eee8;
-  color: #476746;
+  background: var(--blue-900);
+  color: var(--steel-300);
 }
 .status.completed {
-  background: #e6edf5;
-  color: #355b7e;
+  background: var(--blue-900);
+  color: var(--steel-300);
 }
 .status.cancelled,
 .status.no_show {
-  background: #f4eae6;
-  color: #8a5444;
+  background: var(--blue-900);
+  color: var(--steel-300);
 }
 .appointment-content h3 {
   font-size: 23px;
@@ -1357,7 +1382,7 @@ small {
   padding: 0 5px;
 }
 .appointment-content > p > a {
-  color: var(--navy);
+  color: var(--cream-100);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -1372,12 +1397,12 @@ small {
   min-height: 32px;
 }
 .appointment-card.past {
-  background: #f7f9fa;
+  background: var(--blue-900);
   box-shadow: none;
 }
 .cancel-confirm {
   padding: 16px;
-  background: #f7efed;
+  background: var(--blue-900);
   margin-top: 15px;
 }
 .cancel-confirm p {
@@ -1413,7 +1438,7 @@ small {
 }
 .quiet-panel .eyebrow {
   font-size: 9px;
-  color: #526c82;
+  color: var(--steel-300);
 }
 .quiet-panel > p {
   font-size: 14px;
@@ -1421,7 +1446,7 @@ small {
   margin-bottom: 12px;
 }
 .panel {
-  background: white;
+  background: var(--blue-900);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 30px;
@@ -1442,7 +1467,7 @@ small {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 1px solid var(--line);
-  background: white;
+  background: var(--blue-900);
   border-radius: var(--radius);
   margin-bottom: 20px;
 }
@@ -1516,7 +1541,7 @@ small {
   grid-template-columns: repeat(7, minmax(0, 1fr));
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: white;
+  background: var(--blue-900);
   min-height: 430px;
   overflow: hidden;
 }
@@ -1553,7 +1578,7 @@ small {
   width: 100%;
   gap: 4px;
   text-align: left;
-  background: #e7eef5;
+  background: var(--blue-900);
   border: 0;
   border-left: 3px solid var(--blue);
   padding: 12px 9px;
@@ -1574,7 +1599,7 @@ small {
 .calendar-event.cancelled,
 .calendar-event.no_show {
   opacity: 0.65;
-  background: #f1e7e3;
+  background: var(--blue-900);
   border-left-color: #ae7869;
 }
 .day-agenda {
@@ -1594,8 +1619,8 @@ small {
   margin: 0;
   max-width: 440px;
   flex: 1;
-  background: white;
-  border: 1px solid #b9c5cf;
+  background: var(--blue-900);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding-left: 15px;
 }
@@ -1605,7 +1630,7 @@ small {
 }
 .client-table {
   border: 1px solid var(--line);
-  background: white;
+  background: var(--blue-900);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -1621,14 +1646,14 @@ small {
   font-size: 9px;
   letter-spacing: 0.1em;
   color: var(--muted);
-  background: #edf2f6;
+  background: var(--blue-900);
 }
 .client-table-row {
   border-top: 1px solid var(--line);
   font-size: 14px;
 }
 .client-table-row:hover {
-  background: #f1f5f8;
+  background: var(--blue-900);
 }
 .client-name {
   display: flex;
@@ -2674,4 +2699,734 @@ small {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Shared material, typographic and interaction system. */
+body {
+  background: var(--paper);
+}
+h1,
+h2,
+h3 {
+  letter-spacing: -0.035em;
+  font-weight: 400;
+}
+em {
+  font-family: inherit;
+}
+svg {
+  stroke-width: 1.35;
+}
+input,
+select,
+textarea {
+  background: var(--blue-950);
+  border-color: var(--steel-500);
+}
+input[type="checkbox"] {
+  accent-color: var(--gold);
+}
+:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 5px;
+}
+.button {
+  border-radius: var(--radius);
+  letter-spacing: 0.025em;
+}
+.button.gold,
+.button.navy {
+  background: var(--material-gold);
+  color: var(--blue-950);
+  box-shadow:
+    inset 0 1px 0 #fff5,
+    0 6px 20px #0002;
+}
+.button.gold:hover,
+.button.navy:hover {
+  background: var(--gold-light);
+}
+.button.outline {
+  color: var(--cream-100);
+  border-color: var(--steel-500);
+}
+.button.outline:hover {
+  background: var(--blue-700);
+}
+.button:active {
+  transform: translateY(1px);
+}
+.eyebrow,
+.brand-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+}
+.brand-label {
+  color: var(--gold-light);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.site-header {
+  background: var(--blue-950);
+  height: 94px;
+}
+.brand {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+}
+.brand-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--steel-300);
+  letter-spacing: 0.24em;
+  margin-top: 9px;
+}
+.main-nav {
+  gap: 28px;
+}
+.preview-banner {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  background: #06111b;
+}
+.section {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
+}
+.section-heading h2 {
+  font-size: clamp(42px, 4.6vw, 66px);
+}
+.entrance {
+  position: relative;
+  isolation: isolate;
+  padding: 30px 5% 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 78% 20%, #304d6266, transparent 55%),
+    linear-gradient(115deg, #081520 25%, #122a3c 70%, #0d2030);
+}
+.entrance:before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(
+      112deg,
+      transparent 65%,
+      #e0c39115 65.1%,
+      transparent 65.3%
+    ),
+    linear-gradient(112deg, transparent 85%, #bac9d215 85.1%, transparent 85.3%);
+}
+.entrance-coordinate,
+.entrance-baseline {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  color: var(--steel-300);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+.entrance-coordinate {
+  padding: 0 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+.entrance-body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 5%;
+  align-items: end;
+  padding: 82px 0 92px;
+}
+.entrance-copy {
+  animation: arrival var(--duration-entrance) var(--curve) both;
+}
+.entrance h1 {
+  font-size: clamp(56px, 6.2vw, 94px);
+  line-height: 1.03;
+  letter-spacing: -0.055em;
+  margin: 26px 0 30px;
+}
+.entrance h1 em {
+  color: var(--gold-light);
+}
+.entrance-description {
+  font-size: 17px;
+  color: var(--steel-300);
+  line-height: 1.9;
+}
+.entrance .hero-actions {
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.entrance-directory {
+  padding: 28px;
+  border: 1px solid var(--line);
+  box-shadow: var(--edge), var(--shadow);
+  background: var(--material-panel);
+  animation: arrival 1400ms var(--curve) both;
+}
+.entrance-directory > .eyebrow {
+  display: block;
+  margin-bottom: 32px;
+  color: var(--steel-300);
+}
+.entrance-directory a {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding: 25px 0;
+}
+.entrance-directory a > span {
+  color: var(--gold);
+  font-size: 12px;
+}
+.entrance-directory a > div {
+  font-family: var(--font-display);
+  font-size: 23px;
+}
+.entrance-directory small {
+  font-family: var(--font-body);
+  font-size: 12px;
+  margin-top: 8px;
+}
+.entrance-directory svg {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.entrance-directory > p {
+  margin: 12px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--steel-300);
+}
+.entrance-baseline {
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.worlds-section {
+  scroll-margin-top: 24px;
+}
+.experience-worlds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.experience-world {
+  padding: 36px 40px;
+  min-height: 470px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  border: 1px solid var(--line);
+  transition:
+    transform var(--duration-panel) var(--curve),
+    border-color var(--ease);
+  overflow: hidden;
+}
+.experience-world:hover {
+  transform: translateY(-5px);
+  border-color: var(--gold);
+}
+.collective-world {
+  background:
+    radial-gradient(ellipse at 100% 0, #304d6288, transparent 65%), #102638;
+}
+.recovery-world {
+  background:
+    radial-gradient(ellipse at 100% 0, #d8cbb622, transparent 70%), #182e3c;
+}
+.world-index {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--steel-300);
+}
+.experience-world h3 {
+  font-size: clamp(40px, 4.2vw, 62px);
+  margin: 24px 0;
+}
+.experience-world .eyebrow {
+  color: var(--gold-light);
+  margin-top: 42px;
+}
+.experience-world p:not(.eyebrow) {
+  max-width: 330px;
+  color: var(--steel-300);
+}
+.world-enter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  font-size: 14px;
+}
+.ritual-story {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 0 80px;
+  border-top: 1px solid var(--line);
+}
+.ritual-story > .eyebrow {
+  grid-column: 1/-1;
+}
+.ritual-story h2 {
+  font-size: clamp(42px, 5vw, 72px);
+}
+.ritual-story > div {
+  align-self: center;
+  color: var(--steel-300);
+}
+.ritual-story ol {
+  grid-column: 1/-1;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 0 0;
+  margin: 55px 0 0;
+  border-top: 1px solid var(--line);
+  gap: 24px;
+}
+.ritual-story li {
+  font-size: 14px;
+}
+.ritual-story li span {
+  color: var(--gold-light);
+  margin-right: 20px;
+}
+.recovery-environment {
+  background:
+    radial-gradient(ellipse at 90% 15%, #d8cbb61c, transparent 45%),
+    var(--blue-900);
+}
+.recovery-intro {
+  min-height: 640px;
+}
+.recovery-intro > .eyebrow {
+  margin: 65px 0 28px;
+  color: var(--gold-light);
+}
+.by-milla {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-style: italic;
+  margin-left: 12px;
+}
+.recovery-intro h1 {
+  font-size: clamp(76px, 10vw, 140px);
+  line-height: 0.95;
+}
+.recovery-lede {
+  color: var(--cream-300);
+  font-size: 18px;
+  margin-top: 36px;
+}
+.recovery-signature {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin-top: 60px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+}
+.recovery-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  background: var(--cream-100);
+  color: var(--blue-950);
+  max-width: none;
+}
+.recovery-details .notice {
+  background: #e5dac5;
+  color: #122a3c;
+  border-color: #8b683b;
+}
+.recovery-details .eyebrow {
+  color: #6f512e;
+}
+.experience-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 28px 0;
+}
+.experience-tabs button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: 2px;
+  font-size: 14px;
+}
+.experience-tabs button[aria-pressed="true"] {
+  color: var(--blue-950);
+  background: var(--cream-100);
+  border-color: var(--cream-100);
+}
+.discovery-row {
+  display: grid;
+  grid-template-columns: 45px 1fr auto;
+  gap: 30px;
+  border-top: 1px solid var(--line);
+  padding: 36px 0;
+  align-items: start;
+}
+.discovery-row h2 {
+  font-size: 34px;
+  margin-bottom: 14px;
+}
+.discovery-row p:not(.brand-label) {
+  color: var(--muted);
+  max-width: 590px;
+  margin: 0;
+}
+.discovery-action {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-end;
+  font-size: 14px;
+}
+.partner-pending {
+  padding: 40px;
+  background: var(--material-panel);
+  border: 1px solid var(--line);
+}
+.partner-pending p {
+  max-width: 580px;
+}
+.visit-brand {
+  color: var(--gold-light);
+  font: 26px/1.2 var(--font-display);
+  padding: 8px 0 24px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+.booking-summary,
+.panel,
+.metrics,
+.appointment-card,
+.selection,
+.blue-panel,
+.client-table,
+.week-calendar {
+  background: var(--material-panel);
+  box-shadow: var(--edge);
+  border-color: var(--line);
+}
+.selection.selected,
+.slots button.selected {
+  border-color: var(--gold-light);
+  box-shadow: inset 3px 0 var(--gold);
+  background: var(--blue-700);
+}
+.steps .active button,
+.steps .done button {
+  color: var(--cream-100);
+}
+.steps .active button > span,
+.steps .done button > span,
+.selected .radio-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--blue-950);
+}
+.steps li.active:after {
+  background: var(--gold);
+}
+.slots button {
+  background: var(--blue-900);
+  color: var(--cream-100);
+}
+.steps button,
+.booking-summary small,
+.selection p,
+.appointment-actions .text-link {
+  font-size: 14px;
+}
+.booking-controls {
+  position: sticky;
+  bottom: 0;
+  background: var(--blue-950);
+  padding: 18px 0;
+  z-index: 3;
+  border-top: 1px solid var(--line);
+}
+.workspace-nav {
+  background: var(--blue-900);
+  border-color: var(--line);
+}
+.workspace-heading h1 {
+  font-family: var(--font-body);
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -0.045em;
+}
+.client-workspace .account-grid > section > .appointment-card:first-of-type {
+  padding: 32px;
+  border: 1px solid var(--steel-500);
+  border-top: 2px solid var(--gold);
+  background:
+    radial-gradient(ellipse at 90% 0, #304d6255, transparent 65%),
+    var(--blue-900);
+}
+.client-workspace .account-grid > section > .appointment-card:first-of-type h3 {
+  font-size: 36px;
+}
+.appointment-date {
+  background: transparent;
+  border-right: 1px solid var(--line);
+}
+.appointment-date strong,
+.metrics strong {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.045em;
+}
+.status.confirmed {
+  background: #233e39;
+  color: #c6e4ce;
+}
+.status.completed {
+  background: #243c50;
+  color: #d1e4f1;
+}
+.status.cancelled,
+.status.no_show {
+  background: #49332b;
+  color: #f0d2bc;
+}
+.appointment-card.past {
+  background: var(--blue-950);
+}
+.quiet-panel .eyebrow,
+.service-number {
+  color: var(--gold-light);
+}
+.calendar-event {
+  background: var(--blue-700);
+  border-left-color: var(--gold);
+  color: var(--cream-100);
+}
+.calendar-event small,
+.calendar-event > span {
+  color: var(--steel-300);
+}
+.calendar-event.cancelled,
+.calendar-event.no_show {
+  background: #332b2b;
+  color: var(--cream-100);
+}
+.segmented button[aria-pressed="true"] {
+  background: var(--blue-700);
+  color: var(--cream-100);
+}
+.notice {
+  background: var(--blue-900);
+  border-color: var(--line);
+  border-left-color: var(--steel-500);
+}
+.error,
+.cancel-confirm {
+  background: #382525;
+  color: #f3d4ca;
+  border-color: #a56e60;
+}
+.footer {
+  background: #06111b;
+  border-top: 1px solid var(--line);
+}
+@keyframes arrival {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .experience-world,
+    .ritual-story {
+      animation: material-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 25%;
+    }
+  }
+}
+@media (max-width: 1100px) {
+  .entrance-body {
+    grid-template-columns: 1fr;
+    padding: 60px 0;
+    gap: 48px;
+  }
+  .entrance-directory {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 36px;
+  }
+  .entrance-directory > .eyebrow,
+  .entrance-directory > p {
+    grid-column: 1/-1;
+  }
+  .main-nav {
+    gap: 18px;
+  }
+}
+@media (max-width: 760px) {
+  .site-header {
+    height: 80px;
+  }
+  .main-nav.open {
+    background: var(--blue-900);
+    z-index: 20;
+  }
+  .entrance {
+    padding-top: 20px;
+  }
+  .entrance-coordinate > span:last-child,
+  .entrance-baseline > span:last-child {
+    display: none;
+  }
+  .entrance h1 {
+    font-size: clamp(46px, 10.5vw, 76px);
+  }
+  .entrance-description {
+    font-size: 16px;
+  }
+  .entrance-body {
+    padding: 45px 0;
+  }
+  .entrance .hero-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .entrance-directory {
+    display: block;
+    padding: 24px;
+  }
+  .entrance-directory > .eyebrow {
+    margin-bottom: 18px;
+  }
+  .entrance-baseline {
+    font-size: 10px;
+    gap: 16px;
+  }
+  .experience-worlds,
+  .ritual-story,
+  .recovery-details {
+    grid-template-columns: 1fr;
+  }
+  .experience-world {
+    min-height: 420px;
+    padding: 28px;
+  }
+  .ritual-story {
+    gap: 24px;
+  }
+  .ritual-story ol {
+    flex-direction: column;
+    margin-top: 12px;
+    gap: 25px;
+  }
+  .recovery-intro {
+    min-height: 0;
+  }
+  .recovery-intro h1 {
+    font-size: clamp(52px, 16vw, 82px);
+  }
+  .recovery-lede {
+    font-size: 16px;
+  }
+  .recovery-details {
+    gap: 25px;
+  }
+  .discovery-row {
+    grid-template-columns: 25px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .discovery-action {
+    grid-column: 2;
+    align-items: flex-start;
+  }
+  .discovery-row h2 {
+    font-size: 30px;
+  }
+  .experience-tabs {
+    gap: 6px;
+  }
+  .experience-tabs button {
+    padding: 10px 12px;
+  }
+  .partner-pending {
+    padding: 24px;
+  }
+  .client-workspace .account-grid > section > .appointment-card:first-of-type {
+    padding: 20px 16px;
+  }
+  .client-workspace
+    .account-grid
+    > section
+    > .appointment-card:first-of-type
+    h3 {
+    font-size: 29px;
+  }
+  .appointment-content {
+    min-width: 0;
+  }
+  .appointment-top {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .brand-label {
+    font-size: 11px;
+  }
+  .booking-controls .button {
+    min-width: 160px;
+  }
+  .preview-banner {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes material-rise {
+  from {
+    transform: translateY(18px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.workspace-nav > a.active {
+  background: var(--blue-700);
+  box-shadow: inset 0 -2px var(--gold);
+}
+.studio-workspace .appointment-card {
+  padding: 20px;
+}
+.studio-workspace .appointment-content h3 {
+  font-family: var(--font-body);
+  font-size: 21px;
+}
+.studio-workspace .appointment-content .brand-label {
+  font-size: 11px;
+  margin-bottom: 8px;
 }

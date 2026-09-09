@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <Brand />
-      <p>A little intention. A lasting difference.</p>
+      <p>Fix It Collective × Recovery Room by Milla</p>
       <div>
         <Link href="/policies">Visit & policies</Link>
         <Link href="/studio">Studio access</Link>

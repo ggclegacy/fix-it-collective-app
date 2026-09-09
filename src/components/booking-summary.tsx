@@ -1,6 +1,7 @@
 import { Clock3, CalendarDays } from "lucide-react";
 import { DateTime } from "luxon";
 import { services, professionals, addons, money, studio } from "@/lib/catalog";
+import { brandForService } from "@/lib/brands";
 import type { Slot } from "@/lib/types";
 export function BookingSummary({
   service,
@@ -16,9 +17,7 @@ export function BookingSummary({
   return (
     <aside className="booking-summary">
       <p className="eyebrow">YOUR VISIT, AT A GLANCE</p>
-      <div className="summary-monogram" aria-hidden="true">
-        F / C
-      </div>
+      <div className="visit-brand">{brandForService(service).name}</div>
       <h3>{service?.name ?? "A little time for you."}</h3>
       <p>
         {service

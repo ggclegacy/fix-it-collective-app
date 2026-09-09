@@ -26,9 +26,6 @@ export default async function Signin({
           Your next visit. Your favorite people.
           <br />A little less life admin.
         </p>
-        <span className="auth-monogram" aria-hidden="true">
-          F / C
-        </span>
       </div>
       <SigninForm next={next} demo={demoEnabled()} />
     </main>

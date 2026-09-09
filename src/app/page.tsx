@@ -1,180 +1,109 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Clock3,
-  CalendarDays,
-  Sparkles,
-} from "lucide-react";
-import { services, money } from "@/lib/catalog";
+import { ArrowUpRight, ArrowDown } from "lucide-react";
+import { ExperienceWorlds } from "@/components/experience-worlds";
 export default function Home() {
   return (
     <main id="main">
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">
-            <span className="gold-dash" /> A MORE CONSIDERED KIND OF CARE
-          </p>
-          <h1>
-            Look sharp.
-            <br />
-            Feel like <em>you.</em>
-          </h1>
-          <p className="hero-description">
-            Good grooming goes beyond the mirror. Make space for yourself, with
-            personal care that fits the way you live.
-          </p>
-          <div className="hero-actions">
-            <Link className="button gold" href="/book">
-              Find your next visit <ArrowUpRight size={19} />
-            </Link>
-            <Link className="text-link light" href="/collective">
-              Meet the collective <ArrowRight size={17} />
-            </Link>
-          </div>
-          <div className="hero-foot">
-            <span>YOUR STYLE. YOUR PEOPLE. YOUR PLACE.</span>
-            <span>01 — THE COLLECTIVE</span>
-          </div>
+      <section className="entrance">
+        <div className="entrance-coordinate">
+          <span>EUNICE, LOUISIANA</span>
+          <span>PEOPLE / BEAUTY / WELLNESS / COMMUNITY</span>
         </div>
-        <div
-          className="brand-poster"
-          aria-label="Fix It Collective brand graphic"
-        >
-          <div className="poster-top">
-            <span>
-              PERSONAL CARE,
+        <div className="entrance-body">
+          <div className="entrance-copy">
+            <p className="eyebrow">FIX IT COLLECTIVE</p>
+            <h1>
+              A sharper presence.
               <br />
-              WITH PURPOSE.
-            </span>
-            <span>F / C</span>
-          </div>
-          <div className="poster-type">
-            FIX
-            <br />
-            <span>IT.</span>
-          </div>
-          <div className="poster-bottom">
-            <span>
-              GOOD TO BE
+              <em>A deeper exhale.</em>
+            </h1>
+            <p className="entrance-description">
+              Grooming, beauty and recovery.
               <br />
-              YOURSELF.
-            </span>
-            <span className="poster-star">✳</span>
+              Two distinct identities. One place to return to yourself.
+            </p>
+            <div className="hero-actions">
+              <Link className="button gold" href="/book">
+                Find your next visit <ArrowUpRight size={18} />
+              </Link>
+              <a className="text-link" href="#experiences">
+                Discover your experience <ArrowDown size={16} />
+              </a>
+            </div>
           </div>
+          <aside
+            className="entrance-directory"
+            aria-label="Partner destinations"
+          >
+            <span className="eyebrow">YOUR DESTINATION</span>
+            <Link href="/services">
+              <span>01</span>
+              <div>
+                Fix It Collective<small>Grooming · Beauty · Community</small>
+              </div>
+              <ArrowUpRight size={20} />
+            </Link>
+            <Link href="/recovery">
+              <span>02</span>
+              <div>
+                Recovery Room<small>by Milla · Massage & Wellness</small>
+              </div>
+              <ArrowUpRight size={20} />
+            </Link>
+            <p>RESTORE · CONFIDENCE · TOGETHER</p>
+          </aside>
+        </div>
+        <div className="entrance-baseline">
+          <span>CARE, WITH INTENTION.</span>
+          <a href="#experiences">EXPLORE THE PARTNERSHIP ↓</a>
+          <span>01 — ENTER</span>
         </div>
       </section>
-      <div className="principles">
-        <span>
-          <Sparkles size={17} /> Considered care
-        </span>
-        <span>
-          <CalendarDays size={17} /> Your time, well spent
-        </span>
-        <span>
-          <Clock3 size={17} /> A routine worth keeping
-        </span>
-      </div>
-      <section className="section">
+      <section className="section worlds-section" id="experiences">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">THE SERVICE EDIT</p>
+            <p className="eyebrow">TWO BRANDS. A SHARED PHILOSOPHY.</p>
             <h2>
-              A fresh start.
+              Choose how you
               <br />
-              Down to the details.
+              want to <em>feel.</em>
             </h2>
           </div>
-          <div>
-            <p>
-              Find your essential, or try a new ritual.
-              <br />
-              Every good visit starts with a conversation.
-            </p>
-            <Link className="text-link" href="/services">
-              Explore all services <ArrowUpRight size={18} />
-            </Link>
-          </div>
+          <p>
+            Distinct care. Connected appointments.
+            <br />
+            Your own rhythm, in one place.
+          </p>
         </div>
-        <p className="sample-caption">
-          ILLUSTRATIVE MENU · Services, durations, and prices await studio
-          approval.
-        </p>
-        <div className="service-list">
-          {services.slice(0, 3).map((s) => (
-            <Link
-              key={s.id}
-              className="service-row"
-              href={`/book?service=${s.id}`}
-            >
-              <span className="service-number">{s.number}</span>
-              <div>
-                <span className="eyebrow">{s.category}</span>
-                <h3>{s.name}</h3>
-              </div>
-              <span className="service-meta">
-                {s.duration} min <span>from {money(s.price)}</span>
-              </span>
-              <ArrowUpRight className="row-arrow" />
-            </Link>
-          ))}
-        </div>
+        <ExperienceWorlds />
       </section>
-      <section className="statement">
-        <p className="eyebrow">MORE THAN AN APPOINTMENT</p>
+      <section className="ritual-story section">
+        <p className="eyebrow">THE SPACE BETWEEN VISITS</p>
         <h2>
-          Your people.
+          Care becomes
           <br />
-          Your rhythm.
-          <br />
-          <em>Your collective.</em>
+          <em>part of your rhythm.</em>
         </h2>
         <div>
           <p>
-            We’re building a place for personal care to feel personal again.
-            Thoughtful services. Room to be yourself. And a simpler way to make
-            it part of your everyday.
+            Your next appointment. The details you want remembered. A familiar
+            service, ready to book again.
           </p>
-          <Link href="/collective" className="text-link light">
-            Get to know Fix It <ArrowRight size={18} />
+          <Link className="button outline" href="/account">
+            Enter your personal space <ArrowUpRight size={18} />
           </Link>
         </div>
-      </section>
-      <section className="section return-section">
-        <div>
-          <p className="eyebrow">MAKE IT A GOOD HABIT</p>
-          <h2>
-            Your next visit,
-            <br />
-            already in mind.
-          </h2>
-          <p>
-            Keep your appointments together. Pick up where you left off.
-            <br />
-            Make a little time for yourself.
-          </p>
-          <Link className="button navy" href="/account">
-            Step into your space <ArrowUpRight size={18} />
-          </Link>
-        </div>
-        <div className="routine-card">
-          <span className="eyebrow">YOUR SPACE AT FIX IT</span>
-          <h3>
-            Less life admin.
-            <br />
-            More feeling good.
-          </h3>
-          {[
-            "Your appointments, all together",
-            "Your favorite service, one tap away",
-            "Your routine, on your terms",
-          ].map((t, i) => (
-            <p key={t}>
-              <span>0{i + 1}</span>
-              {t}
-            </p>
-          ))}
-        </div>
+        <ol>
+          <li>
+            <span>01</span>Choose your experience
+          </li>
+          <li>
+            <span>02</span>Find your person & time
+          </li>
+          <li>
+            <span>03</span>Return on your terms
+          </li>
+        </ol>
       </section>
     </main>
   );

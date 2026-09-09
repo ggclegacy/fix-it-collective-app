@@ -11,7 +11,7 @@ export default async function AccountLayout({
   return (
     <>
       <WorkspaceNav />
-      <main id="main" className="workspace">
+      <main id="main" className="workspace client-workspace">
         {children}
       </main>
     </>
