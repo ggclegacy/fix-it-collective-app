@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NetworkDoors } from "@/components/network-doors";
 import { ArrowUpRight, ArrowDown } from "lucide-react";
 import { ExperienceWorlds } from "@/components/experience-worlds";
 export default function Home() {
@@ -77,6 +78,7 @@ export default function Home() {
         </div>
         <ExperienceWorlds />
       </section>
+      <NetworkDoors />
       <section className="ritual-story section">
         <p className="eyebrow">THE SPACE BETWEEN VISITS</p>
         <h2>
