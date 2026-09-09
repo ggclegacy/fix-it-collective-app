@@ -165,10 +165,10 @@ export function ProviderProfileForm({
                   >
                     <defs>
                       <linearGradient id="body-metal" x2="1" y2="1">
-                        <stop stopColor="#dbbea0" stopOpacity=".25" />
+                        <stop stopColor="var(--gold-500)" stopOpacity=".25" />
                         <stop
                           offset="1"
-                          stopColor="#584335"
+                          stopColor="var(--blue-700)"
                           stopOpacity=".12"
                         />
                       </linearGradient>

@@ -1,24 +1,15 @@
 .provider-environment {
-  --room: #08131f;
-  --surface: #102332;
-  --room-text: #eef0ef;
-  --room-muted: #bdcbd2;
-  --room-accent: #d2dce1;
-  --room-edge: #536571;
-  --room-glow: #bdcbd220;
+  --room: var(--blue-950);
+  --surface: var(--blue-900);
+  --room-text: var(--cream-100);
+  --room-muted: var(--cream-300);
+  --room-accent: var(--gold-300);
+  --room-edge: var(--steel-700);
+  --room-glow: color-mix(in srgb, var(--gold-500) 13%, transparent);
   background: var(--room);
   color: var(--room-text);
   isolation: isolate;
   overflow: clip;
-}
-.provider-camilla {
-  --room: #191613;
-  --surface: #2a231e;
-  --room-text: #f4eadd;
-  --room-muted: #d0beb0;
-  --room-accent: #e2bc94;
-  --room-edge: #796453;
-  --room-glow: #be885421;
 }
 .provider-environment h1,
 .provider-environment h2,
@@ -115,17 +106,12 @@
   background:
     linear-gradient(
       90deg,
-      #07111df5 0%,
-      #07111de0 34%,
-      #07111d64 70%,
-      #07111d33
+      color-mix(in srgb, var(--room) 96%, transparent) 0%,
+      color-mix(in srgb, var(--room) 88%, transparent) 34%,
+      color-mix(in srgb, var(--room) 39%, transparent) 70%,
+      color-mix(in srgb, var(--room) 20%, transparent)
     ),
     linear-gradient(0deg, var(--room), transparent 35%);
-}
-.provider-camilla .provider-hero::before {
-  background:
-    linear-gradient(90deg, #191613f5 0%, #191613d4 35%, #19161340 70%),
-    linear-gradient(0deg, var(--room), transparent 45%);
 }
 .provider-hero-copy {
   max-width: 840px;
@@ -166,12 +152,12 @@
   gap: 22px;
   min-height: 54px;
   padding: 15px 24px;
-  background: linear-gradient(115deg, #c0ced5, #f1f4f3 50%, #a9bdc8);
-  border: 1px solid #d7e1e4;
+  background: var(--material-gold);
+  border: 1px solid var(--gold-500);
   box-shadow:
     inset 0 1px #fff,
     0 10px 36px #0004;
-  color: #10202c;
+  color: var(--blue-950);
   font-weight: 600;
   font-size: 14px;
   border-radius: 2px;
@@ -180,13 +166,7 @@
     box-shadow 0.4s;
 }
 .provider-camilla .provider-button {
-  background: linear-gradient(115deg, #dfbc98, #f0dac0 55%, #cdab89);
-  border-color: #d6b595;
-  color: #2a211a;
   border-radius: 5px;
-  box-shadow:
-    inset 0 1px #fff7,
-    0 10px 36px #0003;
 }
 .provider-button:hover {
   transform: translateY(-2px);
@@ -221,7 +201,7 @@
   font-size: 9px;
   letter-spacing: 0.18em;
   color: var(--room-muted);
-  border-top: 1px solid #dbe1dd35;
+  border-top: 1px solid var(--room-edge);
   padding-top: 20px;
 }
 .provider-nav {
@@ -461,8 +441,8 @@
 }
 .goal-options button[aria-pressed="true"] {
   border-color: var(--room-accent);
-  background: #594332;
-  color: #fff2df;
+  background: var(--blue-700);
+  color: var(--gold-300);
 }
 .goal-options button svg {
   margin-left: auto;
@@ -481,13 +461,13 @@
   position: relative;
   height: 500px;
   align-self: center;
-  background: radial-gradient(ellipse, #b38d6025, transparent 65%);
+  background: radial-gradient(ellipse, var(--room-glow), transparent 65%);
 }
 .body-map svg {
   width: 100%;
   height: 100%;
   fill: url(#body-metal);
-  stroke: #c4a586;
+  stroke: var(--gold-500);
   stroke-width: 1.3;
 }
 .body-map .body-lines {
@@ -508,18 +488,18 @@
 .body-point span {
   width: 25px;
   height: 25px;
-  border: 1px solid #e5c39f;
-  background: #30271f;
-  color: #f7e3cc;
+  border: 1px solid var(--gold-500);
+  background: var(--blue-900);
+  color: var(--cream-100);
   border-radius: 50%;
   font-size: 11px;
   display: grid;
   place-items: center;
 }
 .body-point[aria-pressed="true"] span {
-  background: #eed4b4;
-  color: #201913;
-  box-shadow: 0 0 0 5px #dbb1832b;
+  background: var(--gold-300);
+  color: var(--blue-950);
+  box-shadow: 0 0 0 5px var(--room-glow);
 }
 .body-map-caption {
   position: absolute;
@@ -742,10 +722,12 @@
     font-size: clamp(43px, 10vw, 68px);
   }
   .provider-hero::before {
-    background: linear-gradient(0deg, var(--room), #08131fc9 65%, #08131f40);
-  }
-  .provider-camilla .provider-hero::before {
-    background: linear-gradient(0deg, var(--room), #191613c9 70%, #19161345);
+    background: linear-gradient(
+      0deg,
+      var(--room),
+      color-mix(in srgb, var(--room) 79%, transparent) 65%,
+      color-mix(in srgb, var(--room) 25%, transparent)
+    );
   }
   .provider-hero .provider-kicker {
     font-size: 9px;
