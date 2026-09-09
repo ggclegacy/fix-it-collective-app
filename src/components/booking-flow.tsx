@@ -21,6 +21,7 @@ import { BookingConfirmation } from "./booking-confirmation";
 import { BookingSelection } from "./booking-selection";
 import { ReferencePhotos } from "./reference-photos";
 import { SigninForm } from "./signin-form";
+import { useRecoveryIntakeStatus } from "./use-recovery-intake-status";
 export function BookingFlow({
   user,
   demo,
@@ -78,18 +79,23 @@ export function BookingFlow({
   const [ack, setAck] = useState(false);
   const [intake, setIntake] = useState("");
   const [requestKey] = useState(() => crypto.randomUUID());
-  const [hasIntake, setHasIntake] = useState(false),
-    [healthUnchanged, setHealthUnchanged] = useState(false),
-    [waitlisted, setWaitlisted] = useState(false);
-  useEffect(() => {
-    if (!user) return;
-    fetch(
-      `/api/intake${client ? `?client=${encodeURIComponent(client.id)}` : ""}`,
-    )
-      .then((r) => r.json())
-      .then((d) => setHasIntake(Boolean(d.hasIntake)))
-      .catch(() => {});
-  }, [user, client]);
+  const {
+    hasIntake,
+    revision: intakeRevision,
+    statusError: intakeStatusError,
+    refresh: refreshIntake,
+  } = useRecoveryIntakeStatus(
+    (slot?.professionalId ?? professionalId) === "pro-b" ? user?.id : undefined,
+    client?.id,
+  );
+  const [confirmedIntakeRevision, setConfirmedIntakeRevision] = useState<
+    string | null
+  >(null);
+  const healthUnchanged =
+    hasIntake &&
+    confirmedIntakeRevision ===
+      `${user?.id}:${client?.id ?? user?.id}:${intakeRevision}`;
+  const [waitlisted, setWaitlisted] = useState(false);
   const service = catalog.find((s) => s.id === serviceId);
   const currentRules = serviceRules[serviceId];
   const professional = professionals.find(
@@ -171,6 +177,8 @@ export function BookingFlow({
         intake,
         requestKey,
         healthUnchanged,
+        intakeRevision:
+          slot.professionalId === "pro-b" ? intakeRevision : undefined,
       };
       const result = await api<{ id: string }>(
         appointment
@@ -436,8 +444,9 @@ export function BookingFlow({
                       ↗
                     </Link>
                     <p>
-                      After saving your intake, return here to keep your
-                      selected time.
+                      Your booking updates automatically when you return to this
+                      tab. Your selected time stays here; availability is
+                      checked again when you confirm.
                     </p>
                     <button
                       className="text-link"
@@ -445,19 +454,13 @@ export function BookingFlow({
                       onClick={async () => {
                         setBusy(true);
                         try {
-                          const response = await fetch(
-                            `/api/intake${client ? `?client=${encodeURIComponent(client.id)}` : ""}`,
-                          );
-                          const data = await response.json();
-                          if (!response.ok) throw new Error(data.error);
-                          setHasIntake(data.hasIntake);
-                          if (!data.hasIntake)
+                          const found = await refreshIntake();
+                          if (found !== null)
                             setError(
-                              "Finish and sign your intake, then check again.",
+                              found
+                                ? ""
+                                : "Finish and sign your intake, then check again.",
                             );
-                          else setError("");
-                        } catch (e) {
-                          setError(message(e));
                         } finally {
                           setBusy(false);
                         }
@@ -465,12 +468,21 @@ export function BookingFlow({
                     >
                       Check saved intake
                     </button>
+                    {intakeStatusError && (
+                      <p role="status">{intakeStatusError}</p>
+                    )}
                     {hasIntake && (
                       <label className="check-row">
                         <input
                           type="checkbox"
                           checked={healthUnchanged}
-                          onChange={(e) => setHealthUnchanged(e.target.checked)}
+                          onChange={(e) =>
+                            setConfirmedIntakeRevision(
+                              e.target.checked
+                                ? `${user?.id}:${client?.id ?? user?.id}:${intakeRevision}`
+                                : null,
+                            )
+                          }
                         />
                         My health information is current and unchanged since my
                         last saved intake.

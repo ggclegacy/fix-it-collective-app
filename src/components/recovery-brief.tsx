@@ -1,10 +1,17 @@
 import {
   practitionerAccess,
   getProfile,
+  getBodyHistory,
   getRecoveryNote,
 } from "@/lib/recovery/store";
-import { focusAreas, refreshDue, watchFlags } from "@/lib/recovery/model";
+import {
+  describeRegion,
+  focusAreas,
+  refreshDue,
+  watchFlags,
+} from "@/lib/recovery/model";
 import type { User } from "@/lib/types";
+import { BodyHistory } from "./recovery-body-history";
 import { RecoveryNote } from "./recovery-note";
 export function RecoveryBrief({
   viewer,
@@ -28,7 +35,7 @@ export function RecoveryBrief({
   return (
     <section className="rr-brief" aria-label="Recovery Room therapist brief">
       <p className="eyebrow">KAMILLA’S THERAPIST BRIEF</p>
-      <h2>At a glance.</h2>
+      <h2>Your Session Brief.</h2>
       <div className="rr-brief-safety">
         <strong>REVIEW BEFORE TOUCH</strong>
         {refreshDue(profile) && <p>Full profile refresh due.</p>}
@@ -77,6 +84,19 @@ export function RecoveryBrief({
           </dd>
         </div>
       </dl>
+      <div className="rr-body-summary">
+        <h3>Client body report</h3>
+        {d.noProblemAreas && (
+          <p>No pain / problem areas reported. Confirm boundaries below.</p>
+        )}
+        {d.body.map((b) => (
+          <p key={b.area}>
+            <strong>{b.area}</strong>
+            <span>{describeRegion(b)}</span>
+          </p>
+        ))}
+      </div>
+      <BodyHistory history={getBodyHistory(viewer, clientId)} />
       <p>
         <strong>LAST SESSION</strong>{" "}
         {note?.body || "No Recovery Room notes yet."}
@@ -91,7 +111,7 @@ export function RecoveryBrief({
         <p>First massage: {d.firstMassage}</p>
         {d.body.map((x) => (
           <p key={x.area}>
-            {x.area}: {x.tags.join(" · ")}
+            {x.area}: {describeRegion(x)}
           </p>
         ))}
         {Object.entries(d.healthNotes).map(([k, v]) => (

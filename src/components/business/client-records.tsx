@@ -1,4 +1,5 @@
 "use client";
+import { areas as bodyAreas } from "@/lib/recovery/model";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BusinessForm, text, optionalNumber } from "./forms";
@@ -181,7 +182,12 @@ export function SoapForm({
       <fieldset>
         <legend>Areas treated</legend>
         <div className="os-checks">
-          {areas.map((a) => (
+          {Array.from(
+            new Set([
+              ...bodyAreas,
+              ...areas.filter((a) => initial?.areas.includes(a)),
+            ]),
+          ).map((a) => (
             <label key={a}>
               <input
                 type="checkbox"

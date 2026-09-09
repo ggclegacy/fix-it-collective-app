@@ -10,6 +10,7 @@ import { db, transaction } from "../db";
 import type { User } from "../types";
 import {
   CONSENT_VERSION,
+  consentText,
   intakeSchema,
   normalizeIntake,
   refreshDue,
@@ -22,6 +23,7 @@ import { DateTime } from "luxon";
 function tables() {
   const d = db();
   d.exec(`CREATE TABLE IF NOT EXISTS recovery_profiles(client_id TEXT PRIMARY KEY REFERENCES users(id),payload TEXT NOT NULL,revision INTEGER NOT NULL,updated_at TEXT NOT NULL,refreshed_at TEXT NOT NULL,signed_at TEXT NOT NULL,consent_version TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS recovery_profile_revisions(client_id TEXT NOT NULL REFERENCES users(id),revision INTEGER NOT NULL,payload TEXT NOT NULL,updated_at TEXT NOT NULL,refreshed_at TEXT NOT NULL,signed_at TEXT NOT NULL,consent_version TEXT NOT NULL,consent_text TEXT,PRIMARY KEY(client_id,revision));
  CREATE TABLE IF NOT EXISTS recovery_access_log(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL,client_id TEXT NOT NULL,event TEXT NOT NULL,created_at TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS recovery_note_revisions(id TEXT PRIMARY KEY,client_id TEXT NOT NULL REFERENCES users(id),payload TEXT NOT NULL,author_id TEXT NOT NULL REFERENCES users(id),created_at TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS recovery_notes(client_id TEXT PRIMARY KEY REFERENCES users(id),payload TEXT NOT NULL,author_id TEXT NOT NULL REFERENCES users(id),updated_at TEXT NOT NULL);`);
@@ -78,11 +80,21 @@ export function decrypt(payload: string, identity: string): unknown {
   );
 }
 export function practitionerAccess(user: User, clientId: string) {
-  if (!['owner','staff'].includes(user.role)) return false;
-  const role = db().prepare('SELECT role,clinical FROM team_roles WHERE user_id=?').get(user.id) as {role:string;clinical:number}|undefined;
-  if (role?.role === 'front_desk') return false;
-  return Boolean(role?.clinical) || (process.env.RECOVERY_PRACTITIONER_USER_IDS ?? '').split(',').map(s=>s.trim()).includes(user.id) ||
-    (process.env.NODE_ENV === 'development' && user.id === 'demo-staff' && clientId === 'demo-client');
+  if (!["owner", "staff"].includes(user.role)) return false;
+  const role = db()
+    .prepare("SELECT role,clinical FROM team_roles WHERE user_id=?")
+    .get(user.id) as { role: string; clinical: number } | undefined;
+  if (role?.role === "front_desk") return false;
+  return (
+    Boolean(role?.clinical) ||
+    (process.env.RECOVERY_PRACTITIONER_USER_IDS ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .includes(user.id) ||
+    (process.env.NODE_ENV === "development" &&
+      user.id === "demo-staff" &&
+      clientId === "demo-client")
+  );
 }
 function authorize(user: User, clientId: string) {
   if (user.id !== clientId && !practitionerAccess(user, clientId))
@@ -121,6 +133,55 @@ export function getProfile(user: User, clientId = user.id): Profile | null {
   audit(user, "recovery.profile.read", clientId);
   return result;
 }
+/** Preserve only submitted, signed profiles; never capture in-progress answers. */
+function archiveProfile(clientId: string, revision: number) {
+  db()
+    .prepare(
+      `INSERT OR IGNORE INTO recovery_profile_revisions
+    SELECT client_id,revision,payload,updated_at,refreshed_at,signed_at,consent_version,
+      CASE WHEN consent_version=? THEN ? ELSE NULL END
+    FROM recovery_profiles WHERE client_id=? AND revision=?`,
+    )
+    .run(CONSENT_VERSION, consentText, clientId, revision);
+}
+export function getProfileVersion(
+  user: User,
+  clientId: string,
+  revision: number,
+): (Profile & { consentText: string | null }) | null {
+  authorize(user, clientId);
+  if (!Number.isSafeInteger(revision) || revision < 1) return null;
+  tables();
+  // Older installations have only the current profile. Capture that exact version,
+  // but never present a newer profile as an unavailable historical version.
+  archiveProfile(clientId, revision);
+  const row = db()
+    .prepare(
+      "SELECT * FROM recovery_profile_revisions WHERE client_id=? AND revision=?",
+    )
+    .get(clientId, revision) as
+    | {
+        payload: string;
+        revision: number;
+        updated_at: string;
+        refreshed_at: string;
+        signed_at: string;
+        consent_version: string;
+        consent_text: string | null;
+      }
+    | undefined;
+  if (!row) return null;
+  audit(user, "recovery.profile.version.read", clientId);
+  return {
+    answers: intakeSchema.parse(decrypt(row.payload, clientId)),
+    revision: row.revision,
+    updatedAt: row.updated_at,
+    refreshedAt: row.refreshed_at,
+    signedAt: row.signed_at,
+    consentVersion: row.consent_version,
+    consentText: row.consent_text,
+  };
+}
 export function saveProfile(
   user: User,
   input: {
@@ -140,6 +201,7 @@ export function saveProfile(
       );
     if (input.mode !== "full" && (!previous || refreshDue(previous)))
       throw new Error("Please complete a full profile refresh.");
+    if (previous) archiveProfile(user.id, previous.revision);
     const data =
       input.mode === "unchanged"
         ? previous!.answers
@@ -166,6 +228,7 @@ export function saveProfile(
         result.signedAt,
         CONSENT_VERSION,
       );
+    archiveProfile(user.id, result.revision);
     audit(user, `recovery.profile.${input.mode}`);
     return result;
   });
@@ -211,12 +274,61 @@ export function saveRecoveryNote(user: User, clientId: string, body: string) {
     throw new Error("Staff access to Recovery Room required.");
   tables();
   transaction(() => {
-    const previous=db().prepare('SELECT * FROM recovery_notes WHERE client_id=?').get(clientId) as {payload:string;author_id:string;updated_at:string}|undefined;
-    if(previous && !db().prepare('SELECT 1 FROM recovery_note_revisions WHERE client_id=?').get(clientId))
-      db().prepare('INSERT INTO recovery_note_revisions VALUES(?,?,?,?,?)').run(randomUUID(),clientId,previous.payload,previous.author_id,previous.updated_at);
-    const payload=encrypt(body, `note:${clientId}`), now=new Date().toISOString();
-    db().prepare('INSERT INTO recovery_note_revisions VALUES(?,?,?,?,?)').run(randomUUID(),clientId,payload,user.id,now);
-    db().prepare('INSERT INTO recovery_notes VALUES(?,?,?,?) ON CONFLICT(client_id) DO UPDATE SET payload=excluded.payload,author_id=excluded.author_id,updated_at=excluded.updated_at').run(clientId,payload,user.id,now);
-    audit(user, 'recovery.note.write', clientId);
+    const previous = db()
+      .prepare("SELECT * FROM recovery_notes WHERE client_id=?")
+      .get(clientId) as
+      { payload: string; author_id: string; updated_at: string } | undefined;
+    if (
+      previous &&
+      !db()
+        .prepare("SELECT 1 FROM recovery_note_revisions WHERE client_id=?")
+        .get(clientId)
+    )
+      db()
+        .prepare("INSERT INTO recovery_note_revisions VALUES(?,?,?,?,?)")
+        .run(
+          randomUUID(),
+          clientId,
+          previous.payload,
+          previous.author_id,
+          previous.updated_at,
+        );
+    const payload = encrypt(body, `note:${clientId}`),
+      now = new Date().toISOString();
+    db()
+      .prepare("INSERT INTO recovery_note_revisions VALUES(?,?,?,?,?)")
+      .run(randomUUID(), clientId, payload, user.id, now);
+    db()
+      .prepare(
+        "INSERT INTO recovery_notes VALUES(?,?,?,?) ON CONFLICT(client_id) DO UPDATE SET payload=excluded.payload,author_id=excluded.author_id,updated_at=excluded.updated_at",
+      )
+      .run(clientId, payload, user.id, now);
+    audit(user, "recovery.note.write", clientId);
+  });
+}
+
+/** Only body reports leave the server here; health answers and signatures stay private. */
+export function getBodyHistory(
+  user: User,
+  clientId = user.id,
+): import("./model").BodySnapshot[] {
+  authorize(user, clientId);
+  const revisions = tables()
+    .prepare(
+      "SELECT revision FROM recovery_profile_revisions WHERE client_id=? ORDER BY revision DESC LIMIT 12",
+    )
+    .all(clientId) as { revision: number }[];
+  return revisions.flatMap(({ revision }) => {
+    const p = getProfileVersion(user, clientId, revision);
+    return p
+      ? [
+          {
+            revision,
+            updatedAt: p.updatedAt,
+            body: p.answers.body,
+            noProblemAreas: p.answers.noProblemAreas,
+          },
+        ]
+      : [];
   });
 }

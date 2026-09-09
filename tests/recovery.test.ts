@@ -157,3 +157,83 @@ test("practitioner notes are encrypted and never available to clients or general
   delete process.env.RECOVERY_PRACTITIONER_USER_IDS;
   assert.throws(() => getRecoveryNote(staff, client.id));
 });
+
+test("signed versions stay encrypted and unchanged after a client updates their profile", async () => {
+  const { getProfileVersion } = await import("../src/lib/recovery/store");
+  const { intakeReference, readBookingIntake } =
+    await import("../src/lib/booking-intake");
+  const before = getProfile(client)!;
+  const reference = intakeReference(client, before.revision);
+  const update = saveProfile(client, {
+    revision: before.revision,
+    mode: "update",
+    answers: {
+      ...before.answers,
+      pressure: "Light",
+      allergies: "Yes",
+      allergyNote: "New sample allergy",
+      signature: "Updated signature",
+    },
+  });
+  const original = getProfileVersion(client, client.id, before.revision)!;
+  assert.deepEqual(original.answers, before.answers);
+  assert.equal(original.signedAt, before.signedAt);
+  assert.match(original.consentText!, /electronic signature/);
+  assert.equal(
+    getProfileVersion(client, client.id, update.revision)?.answers.pressure,
+    "Light",
+  );
+  assert.throws(() =>
+    getProfileVersion(
+      { ...client, id: "demo-jordan" },
+      client.id,
+      before.revision,
+    ),
+  );
+  assert.throws(() => getProfileVersion(staff, client.id, before.revision));
+  const stored = db()
+    .prepare("SELECT payload FROM recovery_profile_revisions WHERE client_id=?")
+    .all(client.id) as { payload: string }[];
+  assert.ok(
+    stored.every(
+      (row) =>
+        !row.payload.includes("signature") &&
+        !row.payload.includes("Sample Client"),
+    ),
+  );
+  const text = readBookingIntake(client, reference);
+  assert.match(text, /UPDATED SINCE BOOKING/);
+  assert.match(text, /CURRENT ALLERGIES: Yes. New sample allergy/);
+  assert.match(text, /Pressure: Medium/);
+  assert.match(text, /Signed by Sample Client/);
+  assert.throws(
+    () => intakeReference(client, before.revision),
+    /changed in another window/,
+  );
+  assert.equal(
+    intakeReference(client, update.revision),
+    `recovery:${client.id}:${update.revision}`,
+  );
+  assert.equal(getProfileVersion(client, client.id, 999999), null);
+  assert.throws(
+    () => readBookingIntake(client, `recovery:${client.id}:999999`),
+    /unavailable/,
+  );
+});
+
+test("legacy current records are captured before replacement; missing older records are never invented", async () => {
+  const { getProfileVersion } = await import("../src/lib/recovery/store");
+  const before = getProfile(client)!;
+  // Simulate a pre-version-history installation for the current profile only.
+  db()
+    .prepare(
+      "DELETE FROM recovery_profile_revisions WHERE client_id=? AND revision=?",
+    )
+    .run(client.id, before.revision);
+  saveProfile(client, { revision: before.revision, mode: "unchanged" });
+  assert.deepEqual(
+    getProfileVersion(client, client.id, before.revision)?.answers,
+    before.answers,
+  );
+  assert.equal(getProfileVersion(client, client.id, 0), null);
+});

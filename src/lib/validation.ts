@@ -1,6 +1,7 @@
 import { z } from "zod";
 export const bookingSchema = z.object({
   requestKey: z.string().uuid().optional(),
+  intakeRevision: z.number().int().positive().optional(),
   healthUnchanged: z.boolean().optional(),
   healthConsent: z.boolean().optional(),
   serviceId: z.string().min(1),

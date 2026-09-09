@@ -1,5 +1,14 @@
-import { getProfile, practitionerAccess } from "./recovery/store";
-import { refreshDue, CONSENT_VERSION } from "./recovery/model";
+import {
+  getProfile,
+  getProfileVersion,
+  practitionerAccess,
+} from "./recovery/store";
+import {
+  describeRegion,
+  refreshDue,
+  CONSENT_VERSION,
+  watchFlags,
+} from "./recovery/model";
 import { db } from "./db";
 import { canManage } from "./booking-rules";
 import type { User } from "./types";
@@ -10,12 +19,18 @@ export function intakeStatus(user: User) {
     revision: profile?.revision ?? 0,
   };
 }
-export function intakeReference(user: User) {
+export function intakeReference(user: User, expectedRevision?: number) {
   const p = getProfile(user);
   if (!p || refreshDue(p))
     throw new Error(
       "Complete Prepare Your Session before confirming this massage.",
     );
+  if (expectedRevision !== undefined && expectedRevision !== p.revision)
+    throw new Error(
+      "Your intake changed in another window. Review the updated profile before confirming this booking.",
+    );
+  if (!getProfileVersion(user, user.id, p.revision))
+    throw new Error("Unable to preserve your signed intake. Please try again.");
   return `recovery:${user.id}:${p.revision}`;
 }
 export function readBookingIntake(user: User, reference: string) {
@@ -38,12 +53,37 @@ export function readBookingIntake(user: User, reference: string) {
     throw new Error("Intake access denied.");
   const profile = getProfile(user, client);
   if (!profile) throw new Error("Intake not found.");
-  const d = profile.answers;
+  const booked = getProfileVersion(user, client, Number(match[2]));
+  if (!booked)
+    throw new Error(
+      "The signed intake version for this booking is unavailable. Review the current profile with the client; do not treat it as the original record.",
+    );
+  const d = booked.answers;
+  const current = profile.answers;
   return [
-    `Signed by ${d.signature}. Booking intake version ${match[2]}; current version ${profile.revision}.`,
+    ...(profile.revision !== booked.revision
+      ? [
+          `UPDATED SINCE BOOKING · Current profile version ${profile.revision}, confirmed ${profile.updatedAt}.`,
+          `CURRENT WATCH: ${watchFlags(current).join("; ") || "No watch flags reported"}.`,
+          `CURRENT AVOID: ${
+            current.body
+              .filter((b) => b.tags.includes("Avoid"))
+              .map((b) => b.area)
+              .join(", ") || "None marked"
+          }. ${current.avoidNote}`,
+          `CURRENT ALLERGIES: ${current.allergies}. ${current.allergyNote}`,
+        ]
+      : []),
+    `SIGNED PROFILE AT BOOKING · Version ${booked.revision}. Signed by ${d.signature} on ${booked.signedAt}.`,
+    `Work: ${d.work}. ${d.occupation}. Activity: ${d.activity}. First massage: ${d.firstMassage}.`,
     `Goal: ${d.goal}. ${d.goalNote}`,
     `Pressure: ${d.pressure}. Pain: ${d.pain}/10.`,
-    `Body areas: ${d.body.map((b) => `${b.area}: ${b.tags.join(", ")}`).join("; ") || "None marked"}`,
+    `Body areas: ${d.body.map((b) => `${b.area}: ${describeRegion(b)}`).join("; ") || "None marked"}`,
+    ...(d.noProblemAreas
+      ? [
+          "Client reports no pain / problem areas; confirm treatment boundaries.",
+        ]
+      : []),
     `Avoid: ${d.avoidNote || "None noted"}`,
     `Health: ${d.health.join(", ")}. ${Object.entries(d.healthNotes)
       .map(([k, v]) => `${k}: ${v}`)
@@ -54,6 +94,7 @@ export function readBookingIntake(user: User, reference: string) {
     `Medications: ${d.medications}. ${d.medicationNote}`,
     `Blood thinners: ${d.bloodThinner}. Bruising: ${d.bruising}`,
     d.extra,
+    `Consent (${booked.consentVersion}): ${booked.consentText || "Historical wording unavailable; retain the recorded version identifier."}`,
     "Review the current signed profile with the client before treatment.",
   ]
     .filter(Boolean)

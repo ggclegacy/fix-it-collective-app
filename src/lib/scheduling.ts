@@ -174,6 +174,7 @@ export function book(
     intake: string;
     requestKey?: string;
     healthUnchanged?: boolean;
+    intakeRevision?: number;
     healthConsent?: boolean;
   },
   rescheduleId?: string,
@@ -273,7 +274,7 @@ export function book(
         throw new Error(
           "Confirm your health information is current or update your intake.",
         );
-      intakeId = intakeReference(user);
+      intakeId = intakeReference(user, input.intakeRevision);
     }
     const id = rescheduleId ?? randomUUID();
     const now = new Date().toISOString();

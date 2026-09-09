@@ -57,6 +57,11 @@ export const sensations = [
   "Tightness",
   "Soreness",
   "Injury",
+  "Stiffness",
+  "Numbness / tingling",
+  "Recovery / fatigue",
+  "Normal treatment",
+  "Light pressure",
   "Avoid",
   "Focus",
 ] as const;
@@ -99,10 +104,12 @@ export const intakeSchema = z
       .array(
         z.object({
           area: z.enum(areas),
-          tags: z.array(z.enum(sensations)).min(1).max(6),
+          tags: z.array(z.enum(sensations)).max(11),
+          intensity: z.number().int().min(0).max(10).optional(),
         }),
       )
       .max(21),
+    noProblemAreas: z.boolean().optional(),
     avoidNote: short,
     health: z.array(z.enum(conditions)).min(1).max(21),
     healthNotes: z.record(z.string().max(80), short),
@@ -136,6 +143,36 @@ export const intakeSchema = z
       fail("health", "Choose health conditions or None of these.");
     if (new Set(d.body.map((x) => x.area)).size !== d.body.length)
       fail("body", "Body areas must be unique.");
+    if (
+      d.noProblemAreas &&
+      d.body.some(
+        (b) =>
+          b.tags.some(
+            (t) =>
+              ![
+                "Avoid",
+                "Focus",
+                "Normal treatment",
+                "Light pressure",
+              ].includes(t),
+          ) || (b.intensity ?? 0) > 0,
+      )
+    )
+      fail("body", "Clear reported symptoms before choosing no problem areas.");
+    if (d.noProblemAreas && d.pain > 0)
+      fail("pain", "Choose no problem areas or report discomfort today.");
+    for (const b of d.body) {
+      if (!b.tags.length && b.intensity === undefined)
+        fail("body", "Add a sensation, intensity or treatment preference.");
+      if (new Set(b.tags).size !== b.tags.length)
+        fail("body", "Choose each sensation once.");
+      if (
+        b.tags.filter((t) =>
+          ["Avoid", "Focus", "Normal treatment", "Light pressure"].includes(t),
+        ).length > 1
+      )
+        fail("body", "Choose one treatment intention per area.");
+    }
     if (d.allergies === "Yes" && !d.allergyNote)
       fail("allergyNote", "Add your allergies or choose Not sure / discuss.");
     if (d.medications === "Yes" && !d.medicationNote)
@@ -247,6 +284,12 @@ export function watchFlags(d: Intake) {
     ...d.body
       .filter((x) => x.tags.includes("Injury"))
       .map((x) => `Injury: ${x.area}`),
+    ...d.body
+      .filter((x) => x.tags.includes("Numbness / tingling"))
+      .map(
+        (x) =>
+          `Reported numbness / tingling: ${x.area} · discuss before treatment`,
+      ),
   ];
 }
 export function normalizeIntake(d: Intake): Intake {
@@ -266,3 +309,38 @@ export function normalizeIntake(d: Intake): Intake {
     medicationNote: d.medications === "Yes" ? d.medicationNote : "",
   };
 }
+
+export const bodyIntents = [
+  "Focus",
+  "Normal treatment",
+  "Light pressure",
+  "Avoid",
+] as const;
+export function describeRegion(b: Intake["body"][number]) {
+  return [
+    ...b.tags,
+    ...(b.intensity === undefined ? [] : [`intensity ${b.intensity}/10`]),
+  ].join(" · ");
+}
+/** Compare reports, never infer recovery or treatment effectiveness from omissions. */
+export function compareBody(current: Intake["body"], previous: Intake["body"]) {
+  return areas.flatMap((area) => {
+    const now = current.find((b) => b.area === area),
+      before = previous.find((b) => b.area === area);
+    if (!now && !before) return [];
+    if (!now) return [`${area}: no longer marked (not a recovery assessment)`];
+    if (!before) return [`${area}: newly marked · ${describeRegion(now)}`];
+    if (
+      now.intensity === before.intensity &&
+      [...now.tags].sort().join() === [...before.tags].sort().join()
+    )
+      return [];
+    return [`${area}: ${describeRegion(before)} → ${describeRegion(now)}`];
+  });
+}
+export type BodySnapshot = {
+  revision: number;
+  updatedAt: string;
+  body: Intake["body"];
+  noProblemAreas?: boolean;
+};

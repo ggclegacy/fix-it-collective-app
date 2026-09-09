@@ -1,6 +1,10 @@
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getProfile, nextRecoverySession } from "@/lib/recovery/store";
+import {
+  getBodyHistory,
+  getProfile,
+  nextRecoverySession,
+} from "@/lib/recovery/store";
 import { RecoveryIntake } from "@/components/recovery-intake";
 export const metadata = {
   title: "Prepare Your Session · Recovery Room",
@@ -13,9 +17,11 @@ export default async function Prepare() {
   return (
     <RecoveryIntake
       initial={user ? getProfile(user) : null}
+      history={user ? getBodyHistory(user) : []}
       name={user?.name ?? "Welcome"}
       appointment={user ? nextRecoverySession(user) : null}
       guest={!user}
+      persistence={!process.env.VERCEL}
     />
   );
 }

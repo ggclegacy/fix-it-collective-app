@@ -4,9 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from "lucide-react";
 import { BrandEmblem } from "./brand-emblem";
 import { SigninForm } from "./signin-form";
+import { announceIntakeSaved } from "./use-recovery-intake-status";
 import { RecoveryBodyMap } from "./recovery-body-map";
 import { api, message } from "@/lib/client";
 import {
+  describeRegion,
+  bodyIntents,
+  type BodySnapshot,
   answers,
   conditions,
   consentText,
@@ -86,7 +90,7 @@ const changeOptions = [
 ];
 const headings = [
   "A little about your rhythm.",
-  "Where do you need care?",
+  "Your Body Intelligence Map.",
   "Make this time yours.",
   "Care that considers you.",
   "A little context. Better care.",
@@ -102,22 +106,26 @@ const descriptions = [
 ];
 export function RecoveryIntake({
   initial,
+  history = [],
   name,
   appointment,
   guest = false,
+  persistence = true,
 }: {
   initial: Profile | null;
+  history?: BodySnapshot[];
   name: string;
   appointment: SessionDetails;
   guest?: boolean;
+  persistence?: boolean;
 }) {
   const [saved, setSaved] = useState(initial),
     [draft, setDraft] = useState<Draft>(
       initial ? { ...initial.answers, consent: false } : emptyIntake,
     );
-  const [screen, setScreen] = useState<"intro" | "changes" | "flow" | "ready">(
-    initial && !refreshDue(initial) ? "changes" : "intro",
-  );
+  const [screen, setScreen] = useState<
+    "intro" | "changes" | "flow" | "ready" | "preview"
+  >(initial && !refreshDue(initial) ? "changes" : "intro");
   const [step, setStep] = useState(0),
     [changes, setChanges] = useState<string[]>([]),
     [mode, setMode] = useState<"full" | "update">("full"),
@@ -198,7 +206,7 @@ export function RecoveryIntake({
   }
   async function save(unchanged = false) {
     if (pending.current) return;
-    if (guest) {
+    if (guest && persistence) {
       setError("Sign in below to save your session profile.");
       return;
     }
@@ -210,6 +218,11 @@ export function RecoveryIntake({
         );
         return;
       }
+    }
+    if (!persistence) {
+      setError("");
+      setScreen("preview");
+      return;
     }
     pending.current = true;
     setBusy(true);
@@ -223,6 +236,7 @@ export function RecoveryIntake({
       setSaved(profile);
       setDraft({ ...profile.answers, consent: false });
       setScreen("ready");
+      announceIntakeSaved();
     } catch (e) {
       setError(message(e));
     } finally {
@@ -231,29 +245,46 @@ export function RecoveryIntake({
     }
   }
   const summary = (d: Draft) => (
-    <dl className="rr-profile-grid">
-      <div>
-        <dt>Focus</dt>
-        <dd>{focusAreas(d).join(" · ") || "Whole-body relaxation"}</dd>
+    <>
+      <dl className="rr-profile-grid">
+        <div>
+          <dt>Focus</dt>
+          <dd>{focusAreas(d).join(" · ") || "Whole-body relaxation"}</dd>
+        </div>
+        <div>
+          <dt>Pressure</dt>
+          <dd>{d.pressure || "To discuss"}</dd>
+        </div>
+        <div>
+          <dt>Intention</dt>
+          <dd>
+            {d.goal || "To discuss"}
+            {d.goalNote && ` · ${d.goalNote}`}
+          </dd>
+        </div>
+        <div>
+          <dt>Discomfort</dt>
+          <dd>
+            {d.pain} <span>/ 10</span>
+          </dd>
+        </div>
+      </dl>
+      <div className="rr-body-summary">
+        <h3>Your body report</h3>
+        {d.noProblemAreas && (
+          <p>No pain / problem areas reported. Your boundaries still apply.</p>
+        )}
+        {d.body.map((b) => (
+          <p key={b.area}>
+            <strong>{b.area}</strong>
+            <span>{describeRegion(b)}</span>
+          </p>
+        ))}
+        {!d.body.length && (
+          <p>No areas marked. Discuss your preferences with Kamilla.</p>
+        )}
       </div>
-      <div>
-        <dt>Pressure</dt>
-        <dd>{d.pressure || "To discuss"}</dd>
-      </div>
-      <div>
-        <dt>Intention</dt>
-        <dd>
-          {d.goal || "To discuss"}
-          {d.goalNote && ` · ${d.goalNote}`}
-        </dd>
-      </div>
-      <div>
-        <dt>Discomfort</dt>
-        <dd>
-          {d.pain} <span>/ 10</span>
-        </dd>
-      </div>
-    </dl>
+    </>
   );
   return (
     <main id="main" className="rr-environment">
@@ -332,14 +363,15 @@ export function RecoveryIntake({
               <div className="rr-privacy">
                 <ShieldCheck size={20} />
                 <p>
-                  Share only what helps your care. Answers are saved when you
-                  finish and are available to you and authorized Recovery Room
-                  practitioners. They are kept separate from general booking
-                  notes. You can choose to discuss sensitive details in person.
+                  {persistence
+                    ? "Share only what helps your care. Answers are saved when you finish and are available to you and authorized Recovery Room practitioners. They are kept separate from general booking notes. You can choose to discuss sensitive details in person."
+                    : "Explore with sample details. Your answers stay on this page and are not saved or shared with Kamilla. You can preview every step without creating an account."}
                 </p>
               </div>
               <p className="rr-caption">
-                This is the platform preview. Please use sample information.
+                This is the platform preview. Please use sample information.{" "}
+                {!persistence &&
+                  "Secure saving is not available in this hosted preview."}
                 Preparing a profile does not book an appointment.
               </p>
             </>
@@ -441,7 +473,29 @@ export function RecoveryIntake({
                 <>
                   <RecoveryBodyMap
                     body={draft.body}
-                    onChange={(v) => put("body", v)}
+                    history={history}
+                    previous={saved?.answers.body}
+                    noProblemAreas={draft.noProblemAreas ?? false}
+                    onNoProblemAreas={(v) => {
+                      put("noProblemAreas", v);
+                      if (v) put("pain", 0);
+                    }}
+                    onChange={(v) => {
+                      put("body", v);
+                      put(
+                        "noProblemAreas",
+                        Boolean(draft.noProblemAreas) &&
+                          !v.some(
+                            (b) =>
+                              b.tags.some(
+                                (t) =>
+                                  !bodyIntents.includes(
+                                    t as (typeof bodyIntents)[number],
+                                  ),
+                              ) || (b.intensity ?? 0) > 0,
+                          ),
+                      );
+                    }}
                   />
                   <label className="rr-field rr-pain">
                     Discomfort today{" "}
@@ -455,7 +509,11 @@ export function RecoveryIntake({
                       max="10"
                       step="1"
                       value={draft.pain}
-                      onChange={(e) => put("pain", Number(e.target.value))}
+                      onChange={(e) => {
+                        put("pain", Number(e.target.value));
+                        if (Number(e.target.value) > 0)
+                          put("noProblemAreas", false);
+                      }}
                       aria-valuetext={`${draft.pain} out of 10`}
                     />
                     <span className="rr-scale">
@@ -714,7 +772,7 @@ export function RecoveryIntake({
                     </p>
                     {draft.body.map((x) => (
                       <p key={x.area}>
-                        {x.area}: {x.tags.join(" · ")}
+                        {x.area}: {describeRegion(x)}
                       </p>
                     ))}
                   </details>
@@ -750,7 +808,7 @@ export function RecoveryIntake({
                   </div>
                 </>
               )}
-              {step === 5 && guest && (
+              {step === 5 && guest && persistence && (
                 <section className="rr-signin">
                   <h2>Save your personal profile.</h2>
                   <p>
@@ -795,14 +853,17 @@ export function RecoveryIntake({
                   {busy
                     ? "Saving your profile…"
                     : step === 5
-                      ? "Finish preparation"
+                      ? persistence
+                        ? "Finish preparation"
+                        : "Preview your session"
                       : "Continue"}
                   <ArrowRight size={17} />
                 </button>
               </div>
               <p className="rr-caption">
-                Your answers stay in this page until you finish. Leaving before
-                saving clears unsaved changes.
+                {persistence
+                  ? "Your answers stay in this page until you finish. Leaving before saving clears unsaved changes."
+                  : "Preview only. Your answers remain in this page and are not saved or sent."}
               </p>
             </>
           )}
@@ -851,6 +912,38 @@ export function RecoveryIntake({
                 }}
               >
                 Update my profile
+              </button>
+            </>
+          )}
+          {screen === "preview" && (
+            <>
+              <div className="rr-ready-check">
+                <Check size={28} />
+              </div>
+              <p className="eyebrow">SESSION PROFILE · PREVIEW</p>
+              <h1 ref={heading} tabIndex={-1}>
+                Made <em>personal.</em>
+              </h1>
+              <p className="rr-lede">
+                This is how your personalized session profile will look.
+              </p>
+              {summary(draft)}
+              <div className="rr-soft-note">
+                Your answers have not been saved or sent to Kamilla. Personal
+                accounts and secure saving are not available in this hosted
+                preview.
+              </div>
+              <Link className="rr-primary" href="/recovery">
+                Return to Recovery Room <ArrowRight size={16} />
+              </Link>
+              <button
+                className="rr-text-button"
+                onClick={() => {
+                  setStep(5);
+                  setScreen("flow");
+                }}
+              >
+                Review this preview
               </button>
             </>
           )}
