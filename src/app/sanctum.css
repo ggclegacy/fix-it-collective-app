@@ -591,3 +591,13 @@ body:has(.sanctum-home) > .preview-banner {
   position: absolute;
   inset: 0;
 }
+/* WebKit may retain an image's intrinsic width after viewport changes. */
+.sanctum-portal,
+.portal-copy {
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .sanctum-portals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
