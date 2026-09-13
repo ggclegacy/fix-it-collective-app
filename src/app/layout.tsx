@@ -5,6 +5,7 @@ import "./globals.css";
 import "./branding.css";
 import "./heritage.css";
 import "./recovery.css";
+import "./sanctum.css";
 export const metadata: Metadata = {
   title: {
     default: "FIX IT COLLECTIVE — Grooming, Beauty & Recovery",
@@ -32,7 +33,11 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <div className="preview-banner">
+        <div
+          className="preview-banner"
+          role="region"
+          aria-label="Platform preview notice"
+        >
           THE PLATFORM PREVIEW{" "}
           <span>
             Sample services, team & pricing · no live bookings or charges

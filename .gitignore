@@ -16,3 +16,7 @@ test-results/
 .next-business-build/
 
 artifacts/
+
+.next-sanctum-build/
+.vercel
+test-results-*/

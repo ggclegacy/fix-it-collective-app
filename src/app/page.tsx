@@ -1,88 +1,75 @@
 import Link from "next/link";
-import { HeritageStory, OwnershipMarker } from "@/components/heritage-story";
-import { RestoreExperience } from "@/components/restore-experience";
-import "./restore.css";
+import { HeritageStory } from "@/components/heritage-story";
+import { SanctumFilm } from "@/components/sanctum-film";
 import { NetworkDoors } from "@/components/network-doors";
 import { ArrowUpRight, ArrowDown } from "lucide-react";
 import { ExperienceWorlds } from "@/components/experience-worlds";
+
+export const metadata = {
+  title: "Sanctum Collective — A place built around becoming better",
+  description:
+    "One destination in Eunice, Louisiana. Discover Fix It Shop, Casa Valora and Legacy Sanctum: hair, massage, wellness, performance and community.",
+};
+
 export default function Home() {
   return (
-    <main id="main">
-      <RestoreExperience />
+    <main id="main" className="sanctum-home">
+      <section className="sanctum-hero" aria-labelledby="sanctum-title">
+        <SanctumFilm />
+        <div className="sanctum-location">
+          <span>EUNICE, LOUISIANA</span>
+          <span>A LITTLE TIME. A BETTER YOU.</span>
+        </div>
+        <div className="sanctum-copy">
+          <p className="eyebrow">SANCTUM COLLECTIVE</p>
+          <h1 id="sanctum-title">
+            A place built around
+            <br /> <em>becoming better.</em>
+          </h1>
+          <p className="sanctum-description">
+            Hair. Massage. Wellness.
+            <br className="mobile-break" /> Performance. Community.
+          </p>
+          <div className="hero-actions">
+            <Link className="button gold" href="/book">
+              Book Your Experience <ArrowUpRight size={17} />
+            </Link>
+            <a className="sanctum-explore" href="#experiences">
+              Explore the Sanctum <ArrowDown size={16} />
+            </a>
+          </div>
+        </div>
+        <div className="sanctum-baseline">
+          <span>LOOK BETTER. FEEL BETTER. LIVE BETTER.</span>
+          <a href="#experiences" aria-label="Scroll to the three experiences">
+            SCROLL TO DISCOVER <ArrowDown size={15} />
+          </a>
+        </div>
+      </section>
       <div id="home-content">
-        <section className="entrance">
-          <div className="entrance-coordinate">
-            <span>EUNICE, LOUISIANA</span>
-            <span>PEOPLE / BEAUTY / WELLNESS / COMMUNITY</span>
-          </div>
-          <div className="entrance-body">
-            <div className="entrance-copy">
-              <p className="eyebrow">FIX IT COLLECTIVE</p>
-              <h1 tabIndex={-1}>
-                A sharper presence.
-                <br />
-                <em>A deeper exhale.</em>
-              </h1>
-              <p className="entrance-description">
-                Grooming, beauty and recovery.
-                <br />
-                Two distinct identities. One place to return to yourself.
-              </p>
-              <OwnershipMarker />
-              <div className="hero-actions">
-                <Link className="button gold" href="/book">
-                  Find your next visit <ArrowUpRight size={18} />
-                </Link>
-                <a className="text-link" href="#experiences">
-                  Discover your experience <ArrowDown size={16} />
-                </a>
-              </div>
-            </div>
-            <aside
-              className="entrance-directory"
-              aria-label="Partner destinations"
-            >
-              <span className="eyebrow">YOUR DESTINATION</span>
-              <Link href="/services">
-                <span>01</span>
-                <div>
-                  Fix It Collective<small>Grooming · Beauty · Community</small>
-                </div>
-                <ArrowUpRight size={20} />
-              </Link>
-              <Link href="/recovery">
-                <span>02</span>
-                <div>
-                  Recovery Room<small>by Milla · Massage & Wellness</small>
-                </div>
-                <ArrowUpRight size={20} />
-              </Link>
-              <p>RESTORE · CONFIDENCE · TOGETHER</p>
-            </aside>
-          </div>
-          <div className="entrance-baseline">
-            <span>CARE, WITH INTENTION.</span>
-            <a href="#experiences">EXPLORE THE PARTNERSHIP ↓</a>
-            <span>01 — ENTER</span>
-          </div>
-        </section>
-        <section className="section worlds-section" id="experiences">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">TWO BRANDS. A SHARED PHILOSOPHY.</p>
-              <h2>
-                Choose how you
-                <br />
-                want to <em>feel.</em>
-              </h2>
-            </div>
-            <p>
-              Distinct care. Connected appointments.
+        <section
+          className="section sanctum-worlds"
+          id="experiences"
+          aria-labelledby="worlds-title"
+        >
+          <div className="sanctum-section-heading">
+            <p className="eyebrow">YOUR PLACE TO BECOME</p>
+            <h2 id="worlds-title">
+              Three visions.
               <br />
-              Your own rhythm, in one place.
+              <em>One Sanctum.</em>
+            </h2>
+            <p>
+              Confidence in how you look. Space to restore.
+              <br />
+              The intention to take it further.
             </p>
           </div>
           <ExperienceWorlds />
+          <p className="sanctum-concept-note">
+            A glimpse of the vision · Concept imagery; actual people and spaces
+            to come.
+          </p>
         </section>
         <HeritageStory />
         <NetworkDoors />
@@ -99,7 +86,7 @@ export default function Home() {
               service, ready to book again.
             </p>
             <Link className="button outline" href="/account">
-              Enter your personal space <ArrowUpRight size={18} />
+              Your personal space <ArrowUpRight size={18} />
             </Link>
           </div>
           <ol>

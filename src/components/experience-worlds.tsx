@@ -1,50 +1,66 @@
+import Image from "next/image";
 import Link from "next/link";
-import { BrandEmblem } from "./brand-emblem";
 import { ArrowUpRight } from "lucide-react";
+const worlds = [
+  {
+    name: "Fix It Shop",
+    word: "CONFIDENCE",
+    owner: "KATIE’S MEN’S SALON",
+    href: "/grooming",
+    image: "confidence",
+    description:
+      "Personal style. A sharper presence. The confidence to show up as yourself.",
+  },
+  {
+    name: "Casa Valora",
+    word: "RESTORE",
+    owner: "KAMILLA’S MASSAGE & WELLNESS",
+    href: "/recovery",
+    image: "restore",
+    description:
+      "Professional massage, recovery and a little room to return to yourself.",
+  },
+  {
+    name: "Legacy Sanctum",
+    word: "BUILD",
+    owner: "LIFESTYLE · PERFORMANCE · LEGACY",
+    href: "/legacy",
+    image: "build",
+    description:
+      "Care that continues beyond the visit. Invest in how you live, grow and move forward.",
+  },
+];
 export function ExperienceWorlds() {
   return (
-    <div className="experience-worlds">
-      <Link className="experience-world collective-world" href="/grooming">
-        <div className="world-identity">
-          <span className="world-index">01 / KATIE’S STUDIO</span>
-          <BrandEmblem size={200} decorative />
-        </div>
-        <div>
-          <p className="eyebrow">FIX IT COLLECTIVE</p>
-          <h3>
-            The art of
-            <br />
-            <em>showing up.</em>
-          </h3>
-          <p>
-            Grooming & beauty. Personal expression, down to the last detail.
-          </p>
-        </div>
-        <span className="world-enter">
-          Enter Katie’s Studio <ArrowUpRight size={20} />
-        </span>
-      </Link>
-      <Link className="experience-world recovery-world" href="/recovery">
-        <div className="world-identity">
-          <span className="world-index">02 / RECOVERY ROOM BY MILLA</span>
-          <BrandEmblem brand="recovery" size={200} decorative />
-        </div>
-        <div>
-          <p className="eyebrow">MIND · BODY · BALANCE</p>
-          <h3>
-            Make room
-            <br />
-            <em>for yourself.</em>
-          </h3>
-          <p>
-            Massage, bodywork & wellness. A distinct space within the
-            collective.
-          </p>
-        </div>
-        <span className="world-enter">
-          Enter Recovery Room <ArrowUpRight size={20} />
-        </span>
-      </Link>
+    <div className="sanctum-portals">
+      {worlds.map((world, index) => (
+        <Link
+          className={`sanctum-portal portal-${world.image}`}
+          href={world.href}
+          key={world.name}
+        >
+          <div className="portal-image">
+            <Image
+              src={`/sanctum/${world.image}.webp`}
+              alt=""
+              fill
+              sizes="(max-width: 760px) 100vw, 33vw"
+            />
+            <span className="portal-number">
+              0{index + 1} / {world.word}
+            </span>
+          </div>
+          <div className="portal-copy">
+            <p className="eyebrow">{world.owner}</p>
+            <h3>{world.name}</h3>
+            <p>{world.description}</p>
+            <span className="portal-link">
+              Explore {world.name}
+              <ArrowUpRight size={18} />
+            </span>
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }

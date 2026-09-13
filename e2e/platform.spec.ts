@@ -12,10 +12,7 @@ test("public booking → new client account → same appointment in studio → c
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
-  await page
-    .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-    .click();
-  await page.getByRole("link", { name: "Find your next visit" }).click();
+  await page.getByRole("link", { name: "Book Your Experience" }).click();
   await page.getByRole("button", { name: /Katie Men’s grooming/ }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Haircut", exact: true }).click();
@@ -41,9 +38,7 @@ test("public booking → new client account → same appointment in studio → c
   await expect(page.getByText("Anything you’d like us to know?")).toBeVisible();
   await page.getByRole("checkbox", { name: "I acknowledge" }).check();
   await page.getByRole("button", { name: "Confirm visit" }).click();
-  await expect(
-    page.getByText("Your appointment is saved."),
-  ).toBeVisible();
+  await expect(page.getByText("Your appointment is saved.")).toBeVisible();
   await page.getByRole("link", { name: "View your visits" }).click();
   await expect(
     page.getByRole("heading", { name: "The signature cut" }).first(),
@@ -60,9 +55,7 @@ test("public booking → new client account → same appointment in studio → c
   const studio = await staff.newPage();
   await studio.goto("/signin?next=/studio");
   await studio.getByRole("button", { name: "Enter studio preview" }).click();
-  await expect(
-    studio.getByRole("heading", { level: 1 }),
-  ).toBeVisible();
+  await expect(studio.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(studio).toHaveURL(/\/studio$/);
   const records = await (await studio.request.get("/api/appointments")).json();
   expect(
@@ -72,7 +65,9 @@ test("public booking → new client account → same appointment in studio → c
   await studio.getByLabel("Calendar date").fill(visitDate.toISODate()!);
   await expect(studio.getByText(clientName, { exact: true })).toBeVisible();
   await studio.getByText(clientName, { exact: true }).click();
-  await expect(studio.getByRole("heading", { name: clientName })).toBeVisible({timeout:60000});
+  await expect(studio.getByRole("heading", { name: clientName })).toBeVisible({
+    timeout: 60000,
+  });
   await studio.getByLabel("Service note").fill("INTERNAL QA NOTE");
   await studio.getByRole("button", { name: "Save note" }).click();
   await expect(
@@ -91,9 +86,7 @@ test("public booking → new client account → same appointment in studio → c
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("checkbox", { name: "I acknowledge" }).check();
   await page.getByRole("button", { name: "Confirm new time" }).click();
-  await expect(
-    page.getByText("Your appointment is saved."),
-  ).toBeVisible();
+  await expect(page.getByText("Your appointment is saved.")).toBeVisible();
   const moved = await (await page.request.get("/api/appointments")).json();
   expect(moved.appointments[0].id).toBe(id);
   expect(moved.appointments[0].start_at).not.toBe(
@@ -138,10 +131,6 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
       "/signin",
     ]) {
       await page.goto(route);
-      if (route === "/")
-        await page
-          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-          .click();
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
       await expect(page.locator("h1")).toBeVisible();
       expect(
@@ -168,9 +157,7 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
   }
   await page.goto("/signin?next=/studio");
   await page.getByRole("button", { name: "Enter studio preview" }).click();
-  await expect(
-    page.getByRole("heading", { level: 1 }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     for (const route of [
@@ -181,10 +168,6 @@ test("desktop and phone pages have no horizontal overflow or serious accessibili
       "/studio/settings",
     ]) {
       await page.goto(route);
-      if (route === "/")
-        await page
-          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-          .click();
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
       expect(
         await page.evaluate(
@@ -220,10 +203,6 @@ test("client visits and preferences work at desktop and phone sizes", async ({
     await page.setViewportSize({ width, height: 900 });
     for (const route of ["/account", "/account/profile"]) {
       await page.goto(route);
-      if (route === "/")
-        await page
-          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-          .click();
       await expect(page.locator('main[aria-busy="true"]')).toHaveCount(0);
       expect(
         await page.evaluate(
@@ -262,7 +241,11 @@ test("partner discovery preserves identity and does not invent bookable recovery
   ).toBeVisible();
   await page.goto("/book?experience=camilla");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page.getByRole("button", { name: "First massage", exact: true }).click();
+  await page
+    .getByRole("button", { name: "First massage", exact: true })
+    .click();
   await page.getByRole("button", { name: /Personalized massage/ }).click();
-  await expect(page.locator(".visit-brand")).toHaveText("Recovery Room by Milla");
+  await expect(page.locator(".visit-brand")).toHaveText(
+    "Recovery Room by Milla",
+  );
 });

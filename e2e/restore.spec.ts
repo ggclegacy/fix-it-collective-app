@@ -1,190 +1,180 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-test("entry, keyboard skip, returning visit and live homepage", async ({
+test("homepage is available immediately, autoplay is muted, scrolling never waits", async ({
   page,
 }) => {
   const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "ENTER THE EXPERIENCE", exact: true }),
-  ).toBeFocused();
-  await page.screenshot({ path: "/tmp/restore-entry-desktop.png" });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-  await page.keyboard.press("Shift+Tab");
-  await expect(
-    page.getByRole("button", { name: "Skip Experience" }),
-  ).toBeFocused();
-  await page.keyboard.press("Escape");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "becoming better",
+  );
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.locator("#home-content h1")).toBeFocused();
-  await page.getByRole("link", { name: "Find your next visit" }).click();
-  await expect(page).toHaveURL(/\/book/);
-  await page.goto("/");
   await expect(
-    page.getByRole("button", { name: "ENTER SITE", exact: true }),
+    page.getByRole("link", { name: "Book Your Experience", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "ENTER SITE", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Replay Experience" }),
-  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page.locator("video").evaluate((v: HTMLVideoElement) => v.currentTime),
+    )
+    .toBeGreaterThan(0);
+  expect(
+    await page.locator("video").evaluate((v: HTMLVideoElement) => ({
+      muted: v.muted,
+      inline: v.playsInline,
+      controls: v.controls,
+    })),
+  ).toEqual({ muted: true, inline: true, controls: false });
+  expect(await page.locator("[inert]").count()).toBe(0);
+  await page.mouse.wheel(0, 700);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(300);
+  await page
+    .getByRole("heading", { name: "Three visions. One Sanctum." })
+    .scrollIntoViewIfNeeded();
+  await expect(page.locator(".sanctum-portal")).toHaveCount(3);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(errors).toEqual([]);
 });
 
-test("full cinematic playback, pause, audio controls and seamless completion", async ({
+test("still-image selection persists offscreen and motion can resume", async ({
   page,
 }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
-  await page
-    .getByRole("button", { name: "ENTER THE EXPERIENCE", exact: true })
-    .click();
+  await expect
+    .poll(() =>
+      page.locator("video").evaluate((v: HTMLVideoElement) => v.currentTime),
+    )
+    .toBeGreaterThan(0);
+  await page.getByRole("button", { name: "Still image", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Enable sound" }),
-  ).toHaveAttribute("aria-pressed", "false");
-  await expect(page.locator(".restore-caption")).toContainText("quiet power", {
-    timeout: 15000,
-  });
-  await page
-    .getByRole("button", { name: "Pause experience", exact: true })
-    .click();
-  const time = await page
-    .getByRole("progressbar")
-    .getAttribute("aria-valuenow");
-  await page.waitForTimeout(400);
-  expect(
-    await page.getByRole("progressbar").getAttribute("aria-valuenow"),
-  ).toBe(time);
-  await page.screenshot({ path: "/tmp/restore-confidence-desktop.png" });
-  await page.getByRole("button", { name: "Enable sound" }).click();
-  await expect(
-    page.getByRole("button", { name: "Mute sound" }),
+    page.getByRole("button", { name: "Enable motion" }),
   ).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "Resume experience" }).click();
-  await expect(page.locator(".restore-caption")).toContainText(
-    "deeper exhale",
-    { timeout: 15000 },
-  );
-  await page.screenshot({ path: "/tmp/restore-relief-desktop.png" });
-  await expect(page.locator(".restore-caption")).toContainText(
-    "carry everything",
-    { timeout: 15000 },
-  );
-  await expect(page.locator(".restore-caption")).toContainText(
-    "Safety should",
-    { timeout: 15000 },
-  );
-  await page.screenshot({ path: "/tmp/restore-safety-desktop.png" });
-  await expect(page.locator(".restore-caption")).toContainText(
-    "place for you",
-    { timeout: 15000 },
-  );
-  await expect(page.locator(".restore-caption")).toContainText(
-    "One collective",
-    { timeout: 15000 },
-  );
-  await page.screenshot({ path: "/tmp/restore-louisiana-desktop.png" });
-  await expect(page.locator(".restore-reveal")).toBeVisible({ timeout: 15000 });
-  await page.screenshot({ path: "/tmp/restore-seal-desktop.png" });
-  await expect(page.getByRole("dialog")).toHaveCount(0, { timeout: 15000 });
-  await expect(page.locator("#home-content h1")).toBeFocused();
-  await page.screenshot({ path: "/tmp/restore-home-desktop.png" });
-  expect(errors).toEqual([]);
-});
-
-test("mobile reduced-motion story is self-paced and accessible", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  await expect(
-    page.getByRole("button", { name: "ENTER SITE", exact: true }),
-  ).toBeVisible();
-  await page.screenshot({ path: "/tmp/restore-entry-mobile.png" });
-  await page
-    .getByRole("button", { name: "Explore the story at your pace" })
-    .click();
-  await expect(page.locator(".restore")).toHaveAttribute(
-    "data-renderer",
-    "lightweight",
-  );
-  await page.waitForTimeout(300);
-  await expect(page.getByRole("progressbar")).toHaveAttribute(
-    "aria-valuenow",
-    "0",
-  );
-  for (let i = 0; i < 7; i++) {
-    await page.getByRole("button", { name: "Continue story" }).click();
-    await expect(
-      page.locator(".restore-stills img.current-shot"),
-    ).toBeVisible();
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
-    if (i === 3)
-      await page.screenshot({ path: "/tmp/restore-safety-mobile.png" });
-  }
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-  await page.screenshot({ path: "/tmp/restore-seal-mobile.png" });
-  await page.getByRole("button", { name: "Enter site", exact: true }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-});
-
-test("WebGL failure preserves the complete lightweight film", async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    const original = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (
-      this: HTMLCanvasElement,
-      ...args: Parameters<typeof original>
-    ) {
-      if (String(args[0]).includes("webgl"))
-        throw new Error("WebGL unavailable");
-      return original.apply(this, args);
-    } as typeof original;
-  });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  await page
-    .getByRole("button", { name: "ENTER THE EXPERIENCE", exact: true })
-    .click();
-  await expect(page.locator(".restore-caption")).toContainText("quiet power", {
-    timeout: 15000,
-  });
-  await expect(page.locator(".restore")).toHaveAttribute(
-    "data-renderer",
-    "lightweight",
-  );
   expect(
-    await page
-      .locator(".restore-stills img.current-shot")
-      .evaluate(
-        (img: HTMLImageElement) => img.complete && img.naturalWidth > 0,
-      ),
+    await page.locator("video").evaluate((v: HTMLVideoElement) => v.paused),
   ).toBe(true);
-  await page.screenshot({ path: "/tmp/restore-fallback-mobile.png" });
-  await page.getByRole("button", { name: "Skip Experience" }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.evaluate(() => scrollTo({ top: 1600, behavior: "instant" }));
+  await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+  expect(
+    await page.locator("video").evaluate((v: HTMLVideoElement) => v.paused),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Enable motion" }).click();
+  await expect
+    .poll(() =>
+      page.locator("video").evaluate((v: HTMLVideoElement) => v.paused),
+    )
+    .toBe(false);
+  await page.evaluate(() => scrollTo({ top: 1600, behavior: "instant" }));
+  await expect
+    .poll(() =>
+      page.locator("video").evaluate((v: HTMLVideoElement) => v.paused),
+    )
+    .toBe(true);
 });
 
-test("JavaScript disabled still exposes the real homepage", async ({
+for (const mode of ["reduced", "save-data", "failed", "blocked"] as const) {
+  test(`${mode} keeps the poster and site usable`, async ({ page }) => {
+    const videos: string[] = [];
+    page.on("request", (r) => {
+      if (r.url().endsWith(".mp4")) videos.push(r.url());
+    });
+    if (mode === "reduced")
+      await page.emulateMedia({ reducedMotion: "reduce" });
+    if (mode === "save-data")
+      await page.addInitScript(() =>
+        Object.defineProperty(navigator, "connection", {
+          value: Object.assign(new EventTarget(), { saveData: true }),
+        }),
+      );
+    if (mode === "failed")
+      await page.route("**/sanctum/*.mp4", (route) => route.abort());
+    if (mode === "blocked")
+      await page.addInitScript(() => {
+        HTMLMediaElement.prototype.play = () =>
+          Promise.reject(new DOMException("Blocked", "NotAllowedError"));
+      });
+    await page.goto("/");
+    await expect(page.locator(".sanctum-poster")).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .locator(".sanctum-poster")
+          .evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0),
+      )
+      .toBe(true);
+    if (mode === "reduced" || mode === "save-data") {
+      await expect(page.locator("video")).not.toHaveAttribute("src");
+      expect(videos).toEqual([]);
+    }
+    await page
+      .getByRole("link", { name: "Book Your Experience", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/book/);
+  });
+}
+
+test("changing motion preference removes the active video source", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator("video")).toHaveAttribute("src", /desktop/);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator("video")).not.toHaveAttribute("src");
+  await expect(page.getByRole("button", { name: "Still image" })).toHaveCount(
+    0,
+  );
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect
+    .poll(() =>
+      page.locator("video").evaluate((v: HTMLVideoElement) => v.currentTime),
+    )
+    .toBeGreaterThan(0);
+});
+
+test("responsive framing, navigation, single mobile source and silent controls", async ({
+  page,
+}) => {
+  const videos: string[] = [];
+  page.on("request", (r) => {
+    if (r.url().endsWith(".mp4")) videos.push(r.url());
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(page.locator("video")).toHaveAttribute("src", /mobile/);
+  await expect(page.getByRole("button", { name: "Enable sound" })).toHaveCount(
+    0,
+  );
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(
+    page.getByRole("navigation", { name: "Main navigation" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Close navigation" }).click();
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: width === 768 ? 500 : 900 });
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        { message: `${width}px overflow` },
+      )
+      .toBe(true);
+  }
+  expect(videos.every((url) => url.includes("mobile"))).toBe(true);
+});
+
+test("no JavaScript still exposes navigation, poster and all three destinations", async ({
   browser,
 }) => {
-  test.setTimeout(45000);
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(test.info().project.use.baseURL as string);
-  await expect(page.getByRole("dialog")).not.toBeVisible();
-  await page.screenshot({ path: "/tmp/restore-nojs.png" });
-  await page.getByRole("link", { name: "Find your next visit" }).focus();
-  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.locator(".sanctum-portal")).toHaveCount(3);
+  await page
+    .getByRole("link", { name: "Book Your Experience", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/book/);
   await context.close();
 });

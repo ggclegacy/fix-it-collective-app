@@ -64,9 +64,6 @@ test("quick exit replaces the current page and works from the keyboard", async (
   );
   for (const keyboard of [false, true]) {
     await page.goto("/");
-    await page
-      .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-      .click();
     await page.goto("/women");
     if (keyboard) {
       await page
@@ -102,10 +99,6 @@ test("network routes and results work on desktop and phone with accessible contr
     await page.emulateMedia({ reducedMotion: "reduce" });
     for (const route of ["/men", "/women"]) {
       await page.goto(route);
-      if (route === "/")
-        await page
-          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-          .click();
       await expect(page.locator("h1")).toBeVisible();
       const audit = async () => {
         expect(

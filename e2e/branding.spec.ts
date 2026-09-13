@@ -13,10 +13,6 @@ test("approved partner emblems load across public and booking surfaces", async (
       "/book?service=signature-cut",
     ]) {
       await page.goto(route);
-      if (route === "/")
-        await page
-          .getByRole("button", { name: /^(Skip Experience|ENTER SITE)$/ })
-          .click();
       const marks = page.locator("img.brand-emblem");
       await expect(marks.first()).toBeVisible();
       for (const mark of await marks.all()) {

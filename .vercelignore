@@ -1,0 +1,9 @@
+.next-sanctum-build
+artifacts
+test-results
+playwright-report
+docs
+e2e
+tests
+scripts
+test-results-*

@@ -1,0 +1,593 @@
+/* Homepage atmosphere stays in normal flow. No pinned sequence or scroll interception. */
+body:has(.sanctum-home) {
+  background: #07141d;
+}
+body:has(.sanctum-home) > .preview-banner {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  z-index: 45;
+  background: #07141de6;
+  color: #c7c3ba;
+  font-size: 9px;
+  padding: 5px 16px;
+  min-height: 25px;
+}
+.site-header.sanctum-header {
+  position: absolute;
+  top: 28px;
+  inset-inline: 0;
+  z-index: 40;
+  padding: 20px 4.5%;
+  min-height: 86px;
+  background: transparent;
+  border-bottom: 1px solid #e5d2b522;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+.sanctum-wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font: 25px/1.05 var(--font-display);
+  letter-spacing: 0.15em;
+  color: #f4eadb;
+}
+.sanctum-wordmark span {
+  font: 8px/1 var(--font-body);
+  letter-spacing: 0.48em;
+  margin-top: 9px;
+  padding-left: 4px;
+}
+.sanctum-header .main-nav {
+  gap: clamp(12px, 1.6vw, 25px);
+}
+.sanctum-header .main-nav > a:not(.button) {
+  color: #f4eadb;
+  font-size: 11px;
+}
+.sanctum-header .main-nav > a[href="/men"],
+.sanctum-header .main-nav > a[href="/women"] {
+  display: none;
+}
+.sanctum-mobile-book {
+  display: none;
+}
+.sanctum-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  min-height: max(760px, 100svh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #07141d;
+  color: #f4eadb;
+  padding: 190px 6.5% 150px;
+}
+.sanctum-media,
+.sanctum-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sanctum-media img,
+.sanctum-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 45%;
+}
+.sanctum-video {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 850ms ease;
+}
+.sanctum-video.is-playing {
+  opacity: 1;
+}
+.sanctum-shade {
+  z-index: -1;
+  background:
+    linear-gradient(90deg, #07141ddd 0%, #07141d9c 30%, #07141d28 70%),
+    linear-gradient(
+      180deg,
+      #07141d9c 0%,
+      transparent 27%,
+      transparent 50%,
+      #07141d 100%
+    );
+}
+.sanctum-location {
+  position: absolute;
+  top: 151px;
+  left: 6.5%;
+  right: 6.5%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #ddd1be;
+  font-size: 9px;
+  letter-spacing: 0.24em;
+}
+.sanctum-copy {
+  max-width: 760px;
+  padding-top: 38px;
+}
+.sanctum-copy .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: #dac39f;
+  margin-bottom: 28px;
+}
+.sanctum-copy h1 {
+  font-size: clamp(48px, 5.2vw, 84px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  margin-bottom: 30px;
+  text-wrap: balance;
+}
+.sanctum-copy h1 em {
+  color: #e4c9a2;
+}
+.sanctum-description {
+  font-size: 14px;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  color: #e4ded5;
+}
+.sanctum-copy .hero-actions {
+  gap: 27px;
+  margin-top: 35px;
+}
+.sanctum-home .button.gold,
+.sanctum-header .button.gold {
+  background: #d8be95;
+  color: #10202b;
+  border: 1px solid #d8be95;
+  border-radius: 0;
+  font-size: 11px;
+  letter-spacing: 0.045em;
+  padding: 17px 23px;
+  box-shadow: none;
+}
+.sanctum-home .button.gold:hover,
+.sanctum-header .button.gold:hover {
+  background: #ead4b2;
+}
+.sanctum-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 11px;
+  min-height: 44px;
+}
+.sanctum-explore:hover {
+  color: #e4c9a2;
+}
+.sanctum-baseline {
+  position: absolute;
+  left: 6.5%;
+  right: 6.5%;
+  bottom: 35px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  font-size: 8px;
+  letter-spacing: 0.19em;
+  color: #c7c3ba;
+}
+.sanctum-baseline a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+.sanctum-chapter {
+  position: absolute;
+  right: 6.5%;
+  bottom: 140px;
+  font: 10px var(--font-body);
+  letter-spacing: 0.35em;
+  color: #e7d3b3;
+}
+.sanctum-motion,
+.sanctum-sound {
+  position: absolute;
+  right: 6.5%;
+  bottom: 88px;
+  border: 0;
+  background: #07141d80;
+  padding: 10px 12px;
+  color: #e2d9cb;
+  min-height: 44px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+.sanctum-sound {
+  right: calc(6.5% + 105px);
+  min-width: 44px;
+}
+.mobile-break {
+  display: none;
+}
+.sanctum-worlds {
+  background: #07141d;
+  padding-top: 60px;
+  padding-bottom: 90px;
+  scroll-margin-top: 30px;
+}
+.sanctum-section-heading {
+  text-align: center;
+  margin: 0 auto 55px;
+}
+.sanctum-section-heading .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  color: #ceb68f;
+}
+.sanctum-section-heading h2 {
+  font-size: clamp(43px, 5vw, 69px);
+  margin-top: 26px;
+  line-height: 1.07;
+}
+.sanctum-section-heading h2 em {
+  color: #dac39f;
+}
+.sanctum-section-heading > p:last-child {
+  color: #c2c4c3;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.sanctum-portals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 1440px;
+  margin: auto;
+}
+.sanctum-portal {
+  border: 1px solid #dcc7a527;
+  background: #0c1b25;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 250ms ease;
+}
+.sanctum-portal:hover {
+  border-color: #d8be9590;
+}
+.portal-image {
+  position: relative;
+  aspect-ratio: 1.2;
+  overflow: hidden;
+}
+.portal-image img {
+  object-fit: cover;
+  object-position: 75% 35%;
+  transition: transform 700ms ease;
+}
+.portal-belong .portal-image img {
+  object-position: 80% 35%;
+}
+.sanctum-portal:hover img {
+  transform: scale(1.025);
+}
+.portal-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, #0c1b25, transparent 55%);
+}
+.portal-number {
+  position: absolute;
+  top: 20px;
+  left: 22px;
+  z-index: 1;
+  color: #f1e7d8;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  background: #07141d9c;
+  padding: 6px 10px;
+}
+.portal-copy {
+  padding: 20px 26px 30px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.portal-copy .eyebrow {
+  color: #cbb590;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  margin-bottom: 17px;
+}
+.portal-copy h3 {
+  font-size: clamp(32px, 3vw, 44px);
+  letter-spacing: -0.04em;
+  margin-bottom: 18px;
+}
+.portal-copy > p:not(.eyebrow) {
+  color: #c0c7c9;
+  font-size: 13px;
+  line-height: 1.9;
+  margin-bottom: 30px;
+}
+.portal-link {
+  margin-top: auto;
+  padding-top: 22px;
+  border-top: 1px solid #dcc7a527;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: #e1ccb0;
+}
+.sanctum-concept-note {
+  color: #aab4b9;
+  font-size: 10px;
+  text-align: center;
+  margin: 30px 0 0;
+}
+.sanctum-home :focus-visible,
+.sanctum-header :focus-visible {
+  outline: 2px solid #f4dfba;
+  outline-offset: 5px;
+}
+.legacy-intro {
+  max-width: 1500px;
+  margin: auto;
+}
+.legacy-lede {
+  max-width: 650px;
+}
+.legacy-picture {
+  position: relative;
+  aspect-ratio: 2.3;
+  margin-top: 50px;
+}
+.legacy-picture img {
+  object-fit: cover;
+  object-position: 70% 35%;
+}
+.legacy-next {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  margin-top: 70px;
+}
+.legacy-next .text-link {
+  display: block;
+  margin-top: 25px;
+}
+@media (max-width: 1000px) and (min-width: 761px) {
+  .sanctum-header .main-nav {
+    gap: 14px;
+  }
+  .sanctum-header .main-nav > a[href="/account"],
+  .sanctum-header .main-nav > a[href="/services"] {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .site-header.sanctum-header {
+    padding: 16px 6%;
+    min-height: 76px;
+    top: 26px;
+    gap: 16px;
+  }
+  .sanctum-wordmark {
+    font-size: 21px;
+  }
+  .sanctum-wordmark span {
+    font-size: 7px;
+  }
+  .sanctum-mobile-book {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    min-height: 44px;
+    margin-left: auto;
+  }
+  .sanctum-header .mobile-menu {
+    margin-left: 0;
+    width: 44px;
+    min-width: 44px;
+  }
+  .sanctum-header .main-nav.open {
+    position: absolute;
+    top: 100%;
+    background: #0b1b26;
+    border-bottom: 1px solid #d8be9540;
+    max-height: calc(100svh - 130px);
+    overflow-y: auto;
+  }
+  .sanctum-header .main-nav > a:not(.button) {
+    font-size: 13px;
+    min-height: 44px;
+  }
+  .sanctum-header .main-nav.open > a[href="/men"],
+  .sanctum-header .main-nav.open > a[href="/women"] {
+    display: block;
+  }
+  .sanctum-hero {
+    min-height: max(780px, 100svh);
+    padding: 410px 7% 130px;
+    justify-content: flex-end;
+  }
+  .sanctum-location {
+    top: 129px;
+    left: 7%;
+    right: 7%;
+    font-size: 8px;
+    letter-spacing: 0.17em;
+  }
+  .sanctum-location > span:last-child {
+    display: none;
+  }
+  .sanctum-copy {
+    padding-top: 0;
+  }
+  .sanctum-copy .eyebrow {
+    font-size: 8px;
+    margin-bottom: 19px;
+  }
+  .sanctum-copy h1 {
+    font-size: clamp(38px, 9.1vw, 60px);
+    line-height: 1.07;
+    margin-bottom: 20px;
+  }
+  .sanctum-copy h1 br {
+    display: none;
+  }
+  .sanctum-description {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .sanctum-copy .hero-actions {
+    gap: 14px;
+    margin-top: 23px;
+    flex-wrap: wrap;
+  }
+  .sanctum-home .button.gold {
+    padding: 15px 17px;
+    font-size: 10px;
+  }
+  .sanctum-explore {
+    font-size: 10px;
+    gap: 10px;
+  }
+  .sanctum-media img {
+    object-position: 74% 10%;
+  }
+  .sanctum-media {
+    bottom: 15%;
+  }
+  .sanctum-video {
+    object-position: 50% 20%;
+  }
+  .sanctum-shade {
+    background: linear-gradient(
+      180deg,
+      #07141d88 0%,
+      #07141d0a 24%,
+      #07141d44 39%,
+      #07141df2 63%,
+      #07141d 88%
+    );
+  }
+  .sanctum-baseline {
+    bottom: 19px;
+    left: 7%;
+    right: 7%;
+    font-size: 7px;
+  }
+  .sanctum-baseline > span {
+    max-width: 140px;
+    line-height: 1.8;
+  }
+  .sanctum-baseline a {
+    font-size: 7px;
+    gap: 8px;
+  }
+  .sanctum-chapter {
+    top: 350px;
+    bottom: auto;
+    left: 7%;
+    right: auto;
+    font-size: 8px;
+  }
+  .sanctum-motion {
+    top: 332px;
+    bottom: auto;
+    right: 7%;
+  }
+  .sanctum-sound {
+    top: 332px;
+    bottom: auto;
+    right: calc(7% + 100px);
+  }
+  .sanctum-worlds {
+    padding: 38px 7% 65px;
+  }
+  .sanctum-section-heading {
+    margin-bottom: 35px;
+  }
+  .sanctum-portals {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .portal-image {
+    aspect-ratio: 1.32;
+  }
+  .portal-copy h3 {
+    font-size: 40px;
+  }
+  .portal-copy {
+    padding: 15px 24px 26px;
+  }
+  .sanctum-concept-note {
+    font-size: 9px;
+    line-height: 1.8;
+  }
+  .legacy-next {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .legacy-picture {
+    aspect-ratio: 1;
+  }
+}
+@media (max-width: 380px) {
+  .sanctum-hero {
+    padding-top: 395px;
+  }
+  .sanctum-copy .hero-actions {
+    gap: 8px;
+  }
+  .sanctum-copy h1 {
+    font-size: 37px;
+  }
+}
+@media (min-width: 761px) and (max-height: 700px) {
+  .sanctum-hero {
+    min-height: 720px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .sanctum-home *,
+  .sanctum-header * {
+    transition: none !important;
+    animation: none !important;
+  }
+  .sanctum-video {
+    display: none;
+  }
+  .sanctum-portal:hover img {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .sanctum-copy h1 em {
+    display: block;
+  }
+  .sanctum-media img {
+    object-position: 50% 20%;
+  }
+  .sanctum-video {
+    transition: none;
+  }
+}
+.sanctum-media picture {
+  position: absolute;
+  inset: 0;
+}

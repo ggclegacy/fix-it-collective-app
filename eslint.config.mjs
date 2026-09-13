@@ -9,9 +9,11 @@ export default defineConfig([
     ".next-booking/**",
     ".next-business-os/**",
     ".next-business-build/**",
+    ".next-sanctum-build/**",
     "artifacts/**",
     "next-env.d.ts",
     "test-results/**",
+    "test-results-*/**",
     "playwright-report/**",
   ]),
 ]);

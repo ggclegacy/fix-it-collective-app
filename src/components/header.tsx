@@ -11,8 +11,23 @@ export function Header() {
   return (
     <>
       {(path === "/women" || path.startsWith("/women/")) && <NetworkSafety />}
-      <header className="site-header">
-        <Brand />
+      <header className={`site-header ${path === "/" ? "sanctum-header" : ""}`}>
+        {path === "/" ? (
+          <Link
+            href="/"
+            className="sanctum-wordmark"
+            aria-label="Sanctum Collective home"
+          >
+            SANCTUM<span>COLLECTIVE</span>
+          </Link>
+        ) : (
+          <Brand />
+        )}
+        {path === "/" && (
+          <Link href="/book" className="sanctum-mobile-book">
+            Book <ArrowUpRight size={15} />
+          </Link>
+        )}
         <button
           className="icon-button mobile-menu"
           aria-label={open ? "Close navigation" : "Open navigation"}
@@ -27,9 +42,9 @@ export function Header() {
         >
           {[
             ["/services", "Experiences"],
-            ["/grooming", "Katie’s Studio"],
-            ["/recovery", "Recovery Room"],
-            ["/collective", "The collective"],
+            ["/grooming", "Fix It Shop"],
+            ["/recovery", "Casa Valora"],
+            ["/legacy", "Legacy Sanctum"],
             ["/men", "Men"],
             ["/women", "Women"],
             ["/account", "Your space"],
