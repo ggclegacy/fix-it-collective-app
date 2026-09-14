@@ -1,4 +1,5 @@
 .next-sanctum-build
+.next-motion
 artifacts
 test-results
 playwright-report
