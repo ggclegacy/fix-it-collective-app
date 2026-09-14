@@ -33,11 +33,17 @@ export function SanctumFilm() {
     let failed = false;
     let pending = false;
     let request = 0;
+    let bufferingTimer: ReturnType<typeof setTimeout> | undefined;
+    const clearBuffering = () => {
+      clearTimeout(bufferingTimer);
+      bufferingTimer = undefined;
+    };
     const conserve = () =>
       preference.matches ||
       connection?.saveData ||
       /(^|-)2g$/.test(connection?.effectiveType ?? "");
     const pause = () => {
+      clearBuffering();
       request++;
       pending = false;
       media.pause();
@@ -47,7 +53,7 @@ export function SanctumFilm() {
     const sync = () => {
       if (disposed) return;
       const limited = conserve();
-      setAvailable(!limited && !failed);
+      setAvailable(!limited);
       if (limited || failed || stopped.current || !visible || document.hidden) {
         pause();
         if (limited || failed) {
@@ -64,6 +70,7 @@ export function SanctumFilm() {
       if (pending || !media.paused) return;
       const token = ++request;
       pending = true;
+      watchBuffering();
       void media
         .play()
         .then(() => {
@@ -83,12 +90,25 @@ export function SanctumFilm() {
           // Autoplay refusal is a valid still-image experience, never an entry gate.
           stopped.current = true;
           setStill(true);
-          setPlaying(false);
+          failed = true;
+          sync();
         });
     };
     const error = () => {
       failed = true;
+      stopped.current = true;
+      setStill(true);
       sync();
+    };
+    // A stalled background must never strand the page behind a loading state.
+    // Keep the current frame briefly, then release the transfer and offer retry.
+    const watchBuffering = () => {
+      if (bufferingTimer || !visible || document.hidden || stopped.current)
+        return;
+      // A network stall is harmless while decoded frames still sustain playback.
+      if (!pending && media.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA)
+        return;
+      bufferingTimer = setTimeout(error, 8000);
     };
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -99,20 +119,30 @@ export function SanctumFilm() {
     );
     observer.observe(container);
     media.addEventListener("error", error);
+    media.addEventListener("waiting", watchBuffering);
+    media.addEventListener("stalled", watchBuffering);
+    media.addEventListener("playing", clearBuffering);
     preference.addEventListener("change", sync);
     connection?.addEventListener("change", sync);
     document.addEventListener("visibilitychange", sync);
-    synchronize.current = sync;
+    synchronize.current = () => {
+      failed = false;
+      sync();
+    };
     sync();
     return () => {
       disposed = true;
       request++;
+      clearBuffering();
       synchronize.current = () => {};
       observer.disconnect();
       preference.removeEventListener("change", sync);
       connection?.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
       media.removeEventListener("error", error);
+      media.removeEventListener("waiting", watchBuffering);
+      media.removeEventListener("stalled", watchBuffering);
+      media.removeEventListener("playing", clearBuffering);
       media.pause();
       media.removeAttribute("src");
       media.load();
@@ -137,10 +167,7 @@ export function SanctumFilm() {
     <>
       <div className="sanctum-media" ref={surface} aria-hidden="true">
         <picture>
-          <source
-            media="(max-width: 760px)"
-            srcSet="/sanctum/poster-mobile.webp"
-          />
+          <source media="(max-width: 760px)" srcSet={film.mobilePoster} />
           <Image
             src={film.poster}
             alt=""

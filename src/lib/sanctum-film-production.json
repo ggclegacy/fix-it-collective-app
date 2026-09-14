@@ -1,0 +1,31 @@
+{
+  "film": {
+    "desktop": "/sanctum/photo-film-v1/desktop.mp4",
+    "mobile": "/sanctum/photo-film-v1/mobile.mp4",
+    "poster": "/sanctum/photo-film-v1/desktop-poster.jpg",
+    "mobilePoster": "/sanctum/photo-film-v1/mobile-poster.jpg",
+    "hasAudio": false,
+    "chapters": [
+      {
+        "at": 0,
+        "word": "ARRIVE"
+      },
+      {
+        "at": 6,
+        "word": "CONFIDENCE"
+      },
+      {
+        "at": 12,
+        "word": "RESTORE"
+      },
+      {
+        "at": 18,
+        "word": "BUILD"
+      },
+      {
+        "at": 24,
+        "word": "BELONG"
+      }
+    ]
+  }
+}

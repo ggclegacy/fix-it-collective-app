@@ -10,6 +10,7 @@ export default defineConfig([
     ".next-business-os/**",
     ".next-business-build/**",
     ".next-sanctum-build/**",
+    ".next-motion/**",
     "artifacts/**",
     "next-env.d.ts",
     "test-results/**",

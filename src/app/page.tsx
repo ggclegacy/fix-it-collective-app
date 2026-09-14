@@ -67,8 +67,8 @@ export default function Home() {
           </div>
           <ExperienceWorlds />
           <p className="sanctum-concept-note">
-            A glimpse of the vision · Concept imagery; actual people and spaces
-            to come.
+            A glimpse of the vision · AI-created scenes based on Katie, Kamilla
+            and Neil’s reference photos. Settings and products are illustrative.
           </p>
         </section>
         <HeritageStory />

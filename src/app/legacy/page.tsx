@@ -12,19 +12,21 @@ export default function Legacy() {
         <em>Goes with you.</em>
       </h1>
       <p className="legacy-lede">
-        A vision for living with more intention. Personal care, wellness,
-        performance and community — connected to the person you’re becoming.
+        With Neil, personal care becomes part of your everyday life. Thoughtful
+        products, practical guidance and a little more intention — connected to
+        the man you’re becoming.
       </p>
       <div className="legacy-picture">
         <Image
-          src="/sanctum/belong.webp"
-          alt="Concept illustration of guests connecting in a warm communal space"
+          src="/sanctum/people-v2/neil-tan-v3.webp"
+          alt="AI-created scene based on Neil’s reference photos, showing personal-care product guidance with a guest"
           fill
           sizes="100vw"
         />
       </div>
       <p className="sanctum-concept-note">
-        Concept imagery · The Legacy Sanctum environment is taking shape.
+        Reference-based concept imagery · Setting and packaging are
+        illustrative.
       </p>
       <div className="legacy-next">
         <h2>
@@ -34,9 +36,11 @@ export default function Legacy() {
         </h2>
         <div>
           <p>
-            We’re bringing the next layer of Sanctum to life: the habits, care
-            and connections that continue outside the building. Products and new
-            experiences will be introduced here as they become available.
+            Legacy Sanctum brings Neil’s product store and personal approach to
+            men’s care into the Collective. Discover how to choose and use the
+            products that fit your routine, and carry that care beyond your
+            visit. The product collection will appear here as it becomes
+            available.
           </p>
           <Link href="/services" className="button gold">
             Explore current experiences <ArrowUpRight size={18} />

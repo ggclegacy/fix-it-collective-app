@@ -6,3 +6,4 @@ playwright-report
 test-results
 
 .next-sanctum-build
+.next-motion

@@ -87,7 +87,7 @@ for (const mode of ["reduced", "save-data", "failed", "blocked"] as const) {
         }),
       );
     if (mode === "failed")
-      await page.route("**/sanctum/*.mp4", (route) => route.abort());
+      await page.route("**/sanctum/**/*.mp4", (route) => route.abort());
     if (mode === "blocked")
       await page.addInitScript(() => {
         HTMLMediaElement.prototype.play = () =>
@@ -177,4 +177,40 @@ test("no JavaScript still exposes navigation, poster and all three destinations"
     .click();
   await expect(page).toHaveURL(/\/book/);
   await context.close();
+});
+
+test("failed video releases its source and a deliberate retry recovers", async ({
+  page,
+}) => {
+  await page.route("**/sanctum/**/*.mp4", (route) => route.abort());
+  await page.goto("/");
+  await expect(
+    page.getByRole("button", { name: "Enable motion" }),
+  ).toBeVisible();
+  await expect(page.locator("video")).not.toHaveAttribute("src");
+  await page.unroute("**/sanctum/**/*.mp4");
+  await page.getByRole("button", { name: "Enable motion" }).click();
+  await expect
+    .poll(() =>
+      page.locator("video").evaluate((v: HTMLVideoElement) => v.currentTime),
+    )
+    .toBeGreaterThan(0);
+});
+
+test("prolonged buffering falls back without blocking the homepage", async ({
+  page,
+}) => {
+  // Hold the media response; native autoplay can otherwise play even when
+  // a stubbed play() promise never resolves.
+  await page.route("**/sanctum/**/*.mp4", () => new Promise<void>(() => {}));
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("button", { name: "Enable motion" })).toBeVisible(
+    { timeout: 15000 },
+  );
+  await expect(page.locator("video")).not.toHaveAttribute("src");
+  await expect(page.locator(".sanctum-poster")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Book Your Experience", exact: true }),
+  ).toBeVisible();
+  expect(await page.locator("[inert]").count()).toBe(0);
 });

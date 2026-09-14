@@ -8,6 +8,7 @@ const worlds = [
     owner: "KATIE’S MEN’S SALON",
     href: "/grooming",
     image: "confidence",
+    portrait: "katie",
     description:
       "Personal style. A sharper presence. The confidence to show up as yourself.",
   },
@@ -17,17 +18,19 @@ const worlds = [
     owner: "KAMILLA’S MASSAGE & WELLNESS",
     href: "/recovery",
     image: "restore",
+    portrait: "kamilla",
     description:
       "Professional massage, recovery and a little room to return to yourself.",
   },
   {
     name: "Legacy Sanctum",
     word: "BUILD",
-    owner: "LIFESTYLE · PERFORMANCE · LEGACY",
+    owner: "NEIL’S PERSONAL CARE & PRODUCTS",
     href: "/legacy",
     image: "build",
+    portrait: "neil-tan-v3",
     description:
-      "Care that continues beyond the visit. Invest in how you live, grow and move forward.",
+      "Personal guidance. Everyday care. Products and rituals to carry your confidence forward.",
   },
 ];
 export function ExperienceWorlds() {
@@ -41,7 +44,7 @@ export function ExperienceWorlds() {
         >
           <div className="portal-image">
             <Image
-              src={`/sanctum/${world.image}.webp`}
+              src={`/sanctum/people-v2/${world.portrait}.webp`}
               alt=""
               fill
               sizes="(max-width: 760px) 100vw, 33vw"
